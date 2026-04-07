@@ -1,5 +1,12 @@
 run:
   # The Go version to use for the analysis.
-  # If it is lower than the version used to build golangci-lint, it will usually work
-  # as long as the code is compatible.
-  go: '1.24'
+  # Now using the environment's version (1.26.1).
+  go: '1.26'
+  timeout: 10m
+
+issues:
+  # The linter may have many false positives when first run.
+  # This helps clean up initial errors.
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
