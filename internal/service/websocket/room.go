@@ -72,15 +72,13 @@ func (r *Room) broadcastToClients(message []byte) {
 
 // publishMessage publishes the message to all clients subscribing to the room via Redis.
 func (r *Room) publishMessage(ctx context.Context, message []byte) {
-	if err := r.redis.Publish(ctx, r.id, message).Err(); err != nil {
-		// Log error but don't block
-	}
+	_ = r.redis.Publish(ctx, r.id, message).Err()
 }
 
 // subscribeToRoomMessages subscribes to messages in this room via Redis pub/sub.
 func (r *Room) subscribeToRoomMessages(ctx context.Context) {
 	pubsub := r.redis.Subscribe(ctx, r.id)
-	defer pubsub.Close()
+	defer func() { _ = pubsub.Close() }()
 
 	ch := pubsub.Channel()
 

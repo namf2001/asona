@@ -61,7 +61,7 @@ func NewServer() *http.Server {
 
 	// Initialize logger
 	logger, _ := zap.NewProduction()
-	defer logger.Sync()
+	defer func() { _ = logger.Sync() }()
 
 	// Initialize handlers
 	authCtrl := auth.New(repo)
