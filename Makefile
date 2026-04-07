@@ -1,6 +1,6 @@
 # Simple Makefile for a Go project
 
-include .env
+-include .env
 export
 
 # Build the application

@@ -1,0 +1,5 @@
+run:
+  # The Go version to use for the analysis.
+  # If it is lower than the version used to build golangci-lint, it will usually work
+  # as long as the code is compatible.
+  go: '1.24'
