@@ -1,0 +1,934 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API server for DPC Tools.",
+        "title": "DPC Tools API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/chat/message": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetMessage handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "GetMessage",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/column-lineage": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetColumnLineage handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetColumnLineage",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/column-names": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetColumnNames handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetColumnNames",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/column-provenance": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetColumnProvenance handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetColumnProvenance",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/columns": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetAllColumnsByTable handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetAllColumnsByTable",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/communities": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetCommunities handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetCommunities",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/compiled-sql": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetCompiledSQL handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetCompiledSQL",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/criticality-ranking": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetCriticalityRanking handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetCriticalityRanking",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/export/interface-csv": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ExportSourceToInterfaceCSV handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "ExportSourceToInterfaceCSV",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/export/test-csv": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ExportSourceToTestCSV handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "ExportSourceToTestCSV",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/page/interface": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "PageSourceToInterface handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "PageSourceToInterface",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/platform-health": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetPlatformHealth handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetPlatformHealth",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/project-names": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetProjectNames handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetProjectNames",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/table-lineage": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetTableLineage handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetTableLineage",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/lineage/table-names": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetTableNames handler",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "lineage"
+                ],
+                "summary": "GetTableNames",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Authenticate user and return token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the profile of the currently authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Get user profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sqlagent/cases": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a list of all saved SQL generation cases",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sqlagent"
+                ],
+                "summary": "List SQL Agent cases",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Save the result of a generated SQL case with the formatted data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sqlagent"
+                ],
+                "summary": "Save a SQL generation case",
+                "parameters": [
+                    {
+                        "description": "Case Data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sqlagent.saveCaseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sqlagent/cases/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a saved case by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sqlagent"
+                ],
+                "summary": "Delete a SQL generation case",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Case ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sqlagent/generate": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Accepts raw parsed BRD content and runs the full 5-step agent pipeline to generate BigQuery matching SQL.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sqlagent"
+                ],
+                "summary": "Generate SQL from BRD",
+                "parameters": [
+                    {
+                        "description": "BRD Content",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sqlagent.generateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sqlagent/upload": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Upload an Excel file containing BRD rules to run SQL generation",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sqlagent"
+                ],
+                "summary": "Upload BRD file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "BRD Excel file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "auth.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "user_name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BRDColumn": {
+            "type": "object",
+            "properties": {
+                "business_logic": {
+                    "type": "string"
+                },
+                "calculation_type": {
+                    "type": "string"
+                },
+                "data_type": {
+                    "type": "string"
+                },
+                "default_value": {
+                    "type": "string"
+                },
+                "english_name": {
+                    "type": "string"
+                },
+                "extraction_note": {
+                    "type": "string"
+                },
+                "is_mandatory": {
+                    "type": "boolean"
+                },
+                "lov_file": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "sql_expression": {
+                    "type": "string"
+                },
+                "vietnamese_description": {
+                    "type": "string"
+                },
+                "vietnamese_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BRDFilter": {
+            "type": "object",
+            "properties": {
+                "condition": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "extraction_note": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BRDMetadata": {
+            "type": "object",
+            "properties": {
+                "brd_version": {
+                    "type": "string"
+                },
+                "extraction_confidence": {
+                    "type": "string"
+                },
+                "last_modified": {
+                    "type": "string"
+                },
+                "source_system": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BRDSourceTable": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "extraction_note": {
+                    "type": "string"
+                },
+                "join_condition": {
+                    "type": "string"
+                },
+                "join_type": {
+                    "type": "string"
+                },
+                "table_name": {
+                    "type": "string"
+                },
+                "where_condition": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BRDSpecialLogic": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "example": {
+                    "type": "string"
+                },
+                "extraction_note": {
+                    "type": "string"
+                },
+                "field_name": {
+                    "type": "string"
+                },
+                "logic_type": {
+                    "type": "string"
+                },
+                "sql_formula": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.FormattedBRDData": {
+            "type": "object",
+            "properties": {
+                "business_context": {
+                    "type": "string"
+                },
+                "filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.BRDFilter"
+                    }
+                },
+                "metadata": {
+                    "$ref": "#/definitions/model.BRDMetadata"
+                },
+                "output_columns": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.BRDColumn"
+                    }
+                },
+                "source_tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.BRDSourceTable"
+                    }
+                },
+                "special_logic": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.BRDSpecialLogic"
+                    }
+                },
+                "target_table": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "sqlagent.generateRequest": {
+            "type": "object",
+            "required": [
+                "raw_content"
+            ],
+            "properties": {
+                "file_name": {
+                    "type": "string"
+                },
+                "raw_content": {
+                    "type": "string"
+                }
+            }
+        },
+        "sqlagent.saveCaseRequest": {
+            "type": "object",
+            "required": [
+                "formatted_data",
+                "raw_content",
+                "sql"
+            ],
+            "properties": {
+                "formatted_data": {
+                    "$ref": "#/definitions/model.FormattedBRDData"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "raw_content": {
+                    "type": "string"
+                },
+                "sql": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

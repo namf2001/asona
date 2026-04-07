@@ -1,0 +1,76 @@
+name: CI
+
+on:
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: [main, master]
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
+                  cache: true
+            - name: golangci-lint
+              uses: golangci/golangci-lint-action@v6
+              with:
+                  version: latest
+
+    test:
+        name: Test
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:15
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: asona_test
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-go@v5
+              with:
+                  go-version: "1.24"
+                  cache: true
+
+            - name: Install migrate
+              run: |
+                  curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz
+                  sudo mv migrate /usr/local/bin/
+
+            - name: Run Migrations
+              run: |
+                  migrate -path migrations -database "postgres://postgres:postgres@localhost:5432/asona_test?sslmode=disable" up
+
+            - name: Run Tests
+              env:
+                  DB_HOST: localhost
+                  DB_PORT: 5432
+                  DB_USER: postgres
+                  DB_PASSWORD: postgres
+                  DB_NAME: asona_test
+                  DB_SSL_MODE: disable
+              run: make test
+
+    docker:
+        name: Docker Build
+        runs-on: ubuntu-latest
+        needs: [lint, test]
+        steps:
+            - uses: actions/checkout@v4
+            - name: Build Docker Image
+              run: echo "Building Docker image logic..."

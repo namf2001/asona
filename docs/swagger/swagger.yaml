@@ -1,0 +1,587 @@
+basePath: /api/v1
+definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      user_name:
+        type: string
+    required:
+    - email
+    - user_name
+    type: object
+  model.BRDColumn:
+    properties:
+      business_logic:
+        type: string
+      calculation_type:
+        type: string
+      data_type:
+        type: string
+      default_value:
+        type: string
+      english_name:
+        type: string
+      extraction_note:
+        type: string
+      is_mandatory:
+        type: boolean
+      lov_file:
+        type: string
+      name:
+        type: string
+      source:
+        type: string
+      sql_expression:
+        type: string
+      vietnamese_description:
+        type: string
+      vietnamese_name:
+        type: string
+    type: object
+  model.BRDFilter:
+    properties:
+      condition:
+        type: string
+      description:
+        type: string
+      extraction_note:
+        type: string
+    type: object
+  model.BRDMetadata:
+    properties:
+      brd_version:
+        type: string
+      extraction_confidence:
+        type: string
+      last_modified:
+        type: string
+      source_system:
+        type: string
+    type: object
+  model.BRDSourceTable:
+    properties:
+      alias:
+        type: string
+      description:
+        type: string
+      extraction_note:
+        type: string
+      join_condition:
+        type: string
+      join_type:
+        type: string
+      table_name:
+        type: string
+      where_condition:
+        type: string
+    type: object
+  model.BRDSpecialLogic:
+    properties:
+      description:
+        type: string
+      example:
+        type: string
+      extraction_note:
+        type: string
+      field_name:
+        type: string
+      logic_type:
+        type: string
+      sql_formula:
+        type: string
+    type: object
+  model.FormattedBRDData:
+    properties:
+      business_context:
+        type: string
+      filters:
+        items:
+          $ref: '#/definitions/model.BRDFilter'
+        type: array
+      metadata:
+        $ref: '#/definitions/model.BRDMetadata'
+      output_columns:
+        items:
+          $ref: '#/definitions/model.BRDColumn'
+        type: array
+      source_tables:
+        items:
+          $ref: '#/definitions/model.BRDSourceTable'
+        type: array
+      special_logic:
+        items:
+          $ref: '#/definitions/model.BRDSpecialLogic'
+        type: array
+      target_table:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: string
+      data: {}
+      message:
+        type: string
+    type: object
+  sqlagent.generateRequest:
+    properties:
+      file_name:
+        type: string
+      raw_content:
+        type: string
+    required:
+    - raw_content
+    type: object
+  sqlagent.saveCaseRequest:
+    properties:
+      formatted_data:
+        $ref: '#/definitions/model.FormattedBRDData'
+      is_verified:
+        type: boolean
+      raw_content:
+        type: string
+      sql:
+        type: string
+    required:
+    - formatted_data
+    - raw_content
+    - sql
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API server for DPC Tools.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: DPC Tools API
+  version: "1.0"
+paths:
+  /chat/message:
+    get:
+      description: GetMessage handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetMessage
+      tags:
+      - chat
+  /lineage/column-lineage:
+    get:
+      description: GetColumnLineage handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetColumnLineage
+      tags:
+      - lineage
+  /lineage/column-names:
+    get:
+      description: GetColumnNames handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetColumnNames
+      tags:
+      - lineage
+  /lineage/column-provenance:
+    get:
+      description: GetColumnProvenance handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetColumnProvenance
+      tags:
+      - lineage
+  /lineage/columns:
+    get:
+      description: GetAllColumnsByTable handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetAllColumnsByTable
+      tags:
+      - lineage
+  /lineage/communities:
+    get:
+      description: GetCommunities handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetCommunities
+      tags:
+      - lineage
+  /lineage/compiled-sql:
+    get:
+      description: GetCompiledSQL handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetCompiledSQL
+      tags:
+      - lineage
+  /lineage/criticality-ranking:
+    get:
+      description: GetCriticalityRanking handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetCriticalityRanking
+      tags:
+      - lineage
+  /lineage/export/interface-csv:
+    get:
+      description: ExportSourceToInterfaceCSV handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: ExportSourceToInterfaceCSV
+      tags:
+      - lineage
+  /lineage/export/test-csv:
+    get:
+      description: ExportSourceToTestCSV handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: ExportSourceToTestCSV
+      tags:
+      - lineage
+  /lineage/page/interface:
+    get:
+      description: PageSourceToInterface handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: PageSourceToInterface
+      tags:
+      - lineage
+  /lineage/platform-health:
+    get:
+      description: GetPlatformHealth handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetPlatformHealth
+      tags:
+      - lineage
+  /lineage/project-names:
+    get:
+      description: GetProjectNames handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetProjectNames
+      tags:
+      - lineage
+  /lineage/table-lineage:
+    get:
+      description: GetTableLineage handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetTableLineage
+      tags:
+      - lineage
+  /lineage/table-names:
+    get:
+      description: GetTableNames handler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: GetTableNames
+      tags:
+      - lineage
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User login
+      tags:
+      - auth
+  /profile:
+    get:
+      description: Get the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - auth
+  /sqlagent/cases:
+    get:
+      description: Get a list of all saved SQL generation cases
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List SQL Agent cases
+      tags:
+      - sqlagent
+    post:
+      consumes:
+      - application/json
+      description: Save the result of a generated SQL case with the formatted data
+      parameters:
+      - description: Case Data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/sqlagent.saveCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Save a SQL generation case
+      tags:
+      - sqlagent
+  /sqlagent/cases/{id}:
+    delete:
+      description: Delete a saved case by ID
+      parameters:
+      - description: Case ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a SQL generation case
+      tags:
+      - sqlagent
+  /sqlagent/generate:
+    post:
+      consumes:
+      - application/json
+      description: Accepts raw parsed BRD content and runs the full 5-step agent pipeline
+        to generate BigQuery matching SQL.
+      parameters:
+      - description: BRD Content
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/sqlagent.generateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Generate SQL from BRD
+      tags:
+      - sqlagent
+  /sqlagent/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an Excel file containing BRD rules to run SQL generation
+      parameters:
+      - description: BRD Excel file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Upload BRD file
+      tags:
+      - sqlagent
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
