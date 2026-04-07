@@ -2,33 +2,37 @@ package server
 
 import (
 	"context"
-	"net/http"
 	"crypto/rand"
 	"encoding/hex"
-	
+	"net/http"
+
+	_ "asona/docs/swagger"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	_ "asona/docs/swagger"
 
 	"asona/internal/handler/middleware"
 	"asona/internal/handler/rest/v1/auth"
+	"asona/internal/handler/rest/v1/websocket"
 	"asona/internal/service/database"
 	"asona/internal/service/redis"
+
 	"go.uber.org/zap"
 )
 
 // router defines the routes & handlers of the app.
 type router struct {
-	ctx context.Context
-	db  database.Service
-	rdb redis.Service
+	ctx    context.Context
+	db     database.Service
+	rdb    redis.Service
 	logger *zap.Logger
 
-	authHandler     *auth.Handler
+	authHandler *auth.Handler
+	wsHandler   *websocket.Handler
 }
 
 // handler returns the http.Handler for use by the server.
@@ -57,6 +61,7 @@ func (rtr router) handler() http.Handler {
 func (rtr router) routes(r *gin.Engine) {
 	rtr.public(r)
 	rtr.authenticated(r)
+	rtr.websocketRoutes(r)
 }
 
 func (rtr router) public(r *gin.Engine) {
@@ -70,7 +75,7 @@ func (rtr router) public(r *gin.Engine) {
 
 	// Swagger documentation
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	
+
 	// api/v1 public routes
 	v1 := r.Group("/api/v1")
 	v1.POST("/login", middleware.RSAAuthMiddleware(), rtr.authHandler.Login)
@@ -82,6 +87,17 @@ func (rtr router) authenticated(r *gin.Engine) {
 	v1.Use(middleware.RSAAuthMiddleware())
 
 	v1.GET("/profile", rtr.authHandler.Profile)
+}
+
+// websocketRoutes registers WebSocket routes.
+func (rtr router) websocketRoutes(r *gin.Engine) {
+	// WebSocket endpoint (public, requires userId query param)
+	r.GET("/ws", rtr.wsHandler.HandleWebSocket)
+
+	// WebSocket endpoint with authentication
+	wsAuth := r.Group("/api/v1/ws")
+	wsAuth.Use(middleware.TokenCheckMiddleware())
+	wsAuth.GET("", rtr.wsHandler.HandleWebSocket)
 }
 
 // createRandStr generates a random 32-byte hex string for use as a session secret.

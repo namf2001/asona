@@ -8,31 +8,42 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"asona/config"
+	"asona/internal/constants"
 )
 
 // Service defines Redis operations used across the application.
 type Service interface {
-	// SetSession stores a token → userID mapping with an expiry.
+	// Session operations
 	SetSession(ctx context.Context, token, userID string, ttl time.Duration) error
-
-	// GetUserID returns the userID associated with the given token.
 	GetUserID(ctx context.Context, token string) (string, error)
-
-	// CheckLoginSession returns true if the session still exists and belongs to the given userID.
 	CheckLoginSession(ctx context.Context, userID, token string) (bool, error)
-
-	// DeleteSession removes the token from the session store.
 	DeleteSession(ctx context.Context, token string) error
 
-	// Close closes the Redis connection.
-	Close() error
+	// Pub/Sub operations for WebSocket
+	Publish(ctx context.Context, channel string, message interface{}) error
+	Subscribe(ctx context.Context, channels ...string) *redis.PubSub
 
-	// Client exposes the underlying *redis.Client for advanced use.
+	// User online status operations
+	SetUserOnline(ctx context.Context, userID string, ttl time.Duration) error
+	SetUserOffline(ctx context.Context, userID string) error
+	IsUserOnline(ctx context.Context, userID string) (bool, error)
+	GetOnlineUsers(ctx context.Context, userIDs []string) ([]string, error)
+
+	// General cache operations
+	Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+	Del(ctx context.Context, keys ...string) error
+	Exists(ctx context.Context, keys ...string) (int64, error)
+
+	// Connection management
+	Close() error
 	Client() *redis.Client
+	WSClient() *redis.Client
 }
 
 type service struct {
-	client *redis.Client
+	client   *redis.Client // For session/general operations
+	wsClient *redis.Client // For WebSocket pub/sub
 }
 
 var instance *service
@@ -44,23 +55,43 @@ func New() Service {
 	}
 
 	cfg := config.GetConfig()
+	addr := fmt.Sprintf("%s:%s", cfg.RedisHost, cfg.RedisPort)
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cfg.RedisHost, cfg.RedisPort),
+	// Main client for session operations
+	client := redis.NewClient(&redis.Options{
+		Addr:     addr,
 		Password: cfg.RedisPassword,
-		DB:       0,
+		DB:       constants.RedisDBSession,
 	})
 
-	instance = &service{client: rdb}
+	// WebSocket client for pub/sub
+	wsClient := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: cfg.RedisPassword,
+		DB:       constants.RedisDBWebSocket,
+	})
+
+	instance = &service{
+		client:   client,
+		wsClient: wsClient,
+	}
 	return instance
 }
 
-// Client exposes the underlying redis client.
+// Client exposes the underlying redis client for session operations.
 func (s *service) Client() *redis.Client {
 	return s.client
 }
 
-// Close closes the Redis client connection.
+// WSClient exposes the WebSocket redis client.
+func (s *service) WSClient() *redis.Client {
+	return s.wsClient
+}
+
+// Close closes all Redis client connections.
 func (s *service) Close() error {
-	return s.client.Close()
+	if err := s.client.Close(); err != nil {
+		return err
+	}
+	return s.wsClient.Close()
 }
