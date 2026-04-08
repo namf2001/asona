@@ -3,7 +3,11 @@ package users
 import (
 	"asona/internal/model"
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 func (i impl) GetByID(ctx context.Context, id int64) (model.User, error) {
@@ -27,7 +31,10 @@ func (i impl) GetByID(ctx context.Context, id int64) (model.User, error) {
 	)
 
 	if err != nil {
-		return model.User{}, fmt.Errorf("failed to get user by id: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.User{}, pkgerrors.WithStack(ErrUserNotFound)
+		}
+		return model.User{}, pkgerrors.WithStack(fmt.Errorf("failed to get user by id: %w", err))
 	}
 
 	return user, nil

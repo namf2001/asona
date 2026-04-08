@@ -2,7 +2,11 @@ package auth
 
 import (
 	"context"
+	"errors"
+
 	"asona/internal/model"
+	"asona/internal/repository/users"
+	pkgerrors "github.com/pkg/errors"
 )
 
 // LoginInput represents the input data for user authentication.
@@ -16,6 +20,9 @@ func (i impl) Login(ctx context.Context, input LoginInput) (model.User, string, 
 	// 1. Get user by email
 	user, err := i.repo.User().GetByEmail(ctx, input.Email)
 	if err != nil {
+		if errors.Is(err, users.ErrUserNotFound) {
+			return model.User{}, "", pkgerrors.WithStack(ErrUserNotFound)
+		}
 		return model.User{}, "", err
 	}
 

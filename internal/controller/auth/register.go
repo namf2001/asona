@@ -2,8 +2,13 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
 	"asona/internal/model"
+	"asona/internal/repository/users"
+
+	pkgerrors "github.com/pkg/errors"
 )
 
 // RegisterInput represents the input data for new user registration.
@@ -29,7 +34,10 @@ func (i impl) Register(ctx context.Context, input RegisterInput) (model.User, er
 	// 2. Map to repository
 	createdUser, err := i.repo.User().Create(ctx, user)
 	if err != nil {
-		return model.User{}, fmt.Errorf("failed to register user: %w", err)
+		if errors.Is(err, users.ErrEmailAlreadyExists) {
+			return model.User{}, pkgerrors.WithStack(ErrUserAlreadyExists)
+		}
+		return model.User{}, pkgerrors.WithStack(fmt.Errorf("failed to register user: %w", err))
 	}
 
 	return createdUser, nil

@@ -2,12 +2,18 @@ package tasks
 
 import (
 	"context"
+	"errors"
+
+	"asona/internal/repository/tasks"
 )
 
 // GetByID retrieves a single task's details by its unique identifier.
 func (i impl) GetByID(ctx context.Context, id int64) (TaskResponse, error) {
 	t, err := i.repo.Task().GetByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, tasks.ErrTaskNotFound) {
+			return TaskResponse{}, ErrTaskNotFound
+		}
 		return TaskResponse{}, err
 	}
 

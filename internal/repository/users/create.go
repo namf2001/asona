@@ -4,6 +4,7 @@ import (
 	"asona/internal/model"
 	"context"
 	"fmt"
+	pkgerrors "github.com/pkg/errors"
 )
 
 func (i impl) Create(ctx context.Context, user model.User) (model.User, error) {
@@ -25,7 +26,7 @@ func (i impl) Create(ctx context.Context, user model.User) (model.User, error) {
 	).Scan(&user.ID)
 
 	if err != nil {
-		return model.User{}, fmt.Errorf("failed to create user: %w", err)
+		return model.User{}, pkgerrors.WithStack(fmt.Errorf("failed to create user: %w", err))
 	}
 
 	return user, nil
