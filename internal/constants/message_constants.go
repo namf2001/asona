@@ -6,25 +6,41 @@ type ResponseCode struct {
 }
 
 var (
-	// General
-	Success = ResponseCode{"00", "Success"}
+	// Success
+	Success             = ResponseCode{"00", "Success"}
+	LoginSuccess        = ResponseCode{"INF003", "Login success"}
+	RegisterUserSuccess = ResponseCode{"INF001", "Register user success"}
+	LogoutSuccess       = ResponseCode{"INF004", "Logout success"}
 
-	// Server Errors
-	InternalServerError = ResponseCode{"ERR500", "Internal server error"}
-	GenerateTokenFailed = ResponseCode{"ERR500", "Failed to generate token"}
+	// General Errors
+	InternalServerError  = ResponseCode{"ERR500", "Internal server error"}
+	InvalidRequestParams = ResponseCode{"ERR001", "Invalid request parameters"}
 
 	// Auth errors
 	MissingAuthorizationHeader = ResponseCode{"ERR012", "Missing authorization header"}
 	InvalidAuthorizationHeader = ResponseCode{"ERR013", "Invalid authorization header format"}
 	InvalidToken               = ResponseCode{"ERR009", "Invalid token"}
+	TokenExpired               = ResponseCode{"ERR011", "Token expired"}
+	UserNotFound               = ResponseCode{"ERR004", "User not found"}
+	EmailExists                = ResponseCode{"ERR008", "This email is already registered"}
+	PasswordIncorrect          = ResponseCode{"ERR005", "The password is incorrect"}
+	LoginFail                  = ResponseCode{"ERR006", "Login fail, something wrong"}
+	RegisterUserFail           = ResponseCode{"ERR007", "Register user fail, something wrong"}
+	PermissionDenied           = ResponseCode{"ERR030", "Permission denied, you can't perform this action"}
 
-	// Token errors
-	TokenInvalid = ResponseCode{"ERR009", "Invalid token"}
-	TokenExpired = ResponseCode{"ERR011", "Token expired"}
+	// Chat / Room / Channel errors
+	ChannelNotFound   = ResponseCode{"ERR045", "Channel not found"}
+	CreateChannelFail = ResponseCode{"ERR023", "Create channel fail"}
+	CreateMessageFail = ResponseCode{"ERR051", "Create message fail"}
+	GetMessageFail    = ResponseCode{"ERR052", "Get message fail"}
+	SendMessageWSFail = ResponseCode{"ERR050", "Send message to websocket fail"}
 
-	// Request errors
-	InvalidRequestParams = ResponseCode{"ERR001", "Invalid request parameters"}
-	DecryptRSAFail       = ResponseCode{"ERR099", "Decrypt data fail"}
-	RSANotInitialized    = ResponseCode{"ERR010", "RSA key pair not initialized"}
+	// Organization errors
+	OrganizationNotFound = ResponseCode{"ERR024", "Organization not found"}
+	CreateOrganizationFail = ResponseCode{"ERR023", "Create organization fail"}
+
+	// RSA errors
+	EncryptRSAFail    = ResponseCode{"ERR099", "Encrypt data fail"}
+	DecryptRSAFail    = ResponseCode{"ERR099", "Decrypt data fail"}
+	RSANotInitialized = ResponseCode{"ERR010", "RSA key pair not initialized"}
 )
-	

@@ -10,19 +10,19 @@ import (
 )
 
 // SetUserOnline marks a user as online with a TTL.
-func (s *service) SetUserOnline(ctx context.Context, userID string, ttl time.Duration) error {
+func (s service) SetUserOnline(ctx context.Context, userID string, ttl time.Duration) error {
 	key := constants.UserOnlineKeyPrefix + userID
 	return s.client.Set(ctx, key, "1", ttl).Err()
 }
 
 // SetUserOffline removes the user's online status.
-func (s *service) SetUserOffline(ctx context.Context, userID string) error {
+func (s service) SetUserOffline(ctx context.Context, userID string) error {
 	key := constants.UserOnlineKeyPrefix + userID
 	return s.client.Del(ctx, key).Err()
 }
 
 // IsUserOnline checks if a user is currently online.
-func (s *service) IsUserOnline(ctx context.Context, userID string) (bool, error) {
+func (s service) IsUserOnline(ctx context.Context, userID string) (bool, error) {
 	key := constants.UserOnlineKeyPrefix + userID
 	result, err := s.client.Exists(ctx, key).Result()
 	if err != nil {
@@ -32,7 +32,7 @@ func (s *service) IsUserOnline(ctx context.Context, userID string) (bool, error)
 }
 
 // GetOnlineUsers returns a list of online users from the given user IDs.
-func (s *service) GetOnlineUsers(ctx context.Context, userIDs []string) ([]string, error) {
+func (s service) GetOnlineUsers(ctx context.Context, userIDs []string) ([]string, error) {
 	if len(userIDs) == 0 {
 		return []string{}, nil
 	}

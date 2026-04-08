@@ -46,14 +46,8 @@ type service struct {
 	wsClient *redis.Client // For WebSocket pub/sub
 }
 
-var instance *service
-
-// New returns a singleton Redis Service.
+// New returns a Redis Service. No longer a pointer-based singleton to avoid nil errors.
 func New() Service {
-	if instance != nil {
-		return instance
-	}
-
 	cfg := config.GetConfig()
 	addr := fmt.Sprintf("%s:%s", cfg.RedisHost, cfg.RedisPort)
 
@@ -71,25 +65,24 @@ func New() Service {
 		DB:       constants.RedisDBWebSocket,
 	})
 
-	instance = &service{
+	return service{
 		client:   client,
 		wsClient: wsClient,
 	}
-	return instance
 }
 
 // Client exposes the underlying redis client for session operations.
-func (s *service) Client() *redis.Client {
+func (s service) Client() *redis.Client {
 	return s.client
 }
 
 // WSClient exposes the WebSocket redis client.
-func (s *service) WSClient() *redis.Client {
+func (s service) WSClient() *redis.Client {
 	return s.wsClient
 }
 
 // Close closes all Redis client connections.
-func (s *service) Close() error {
+func (s service) Close() error {
 	if err := s.client.Close(); err != nil {
 		return err
 	}

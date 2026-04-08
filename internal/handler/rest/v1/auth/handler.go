@@ -1,15 +1,15 @@
 package auth
 
-import (
-	authctrl "asona/internal/controller/auth"
-)
+import "asona/internal/controller/auth"
 
+// Handler handles HTTP requests for authentication.
 type Handler struct {
-	authCtrl authctrl.Controller
+	ctrl auth.Controller
 }
 
-func New(ctrl authctrl.Controller) *Handler {
-	return &Handler{
-		authCtrl: ctrl,
+// New creates a new authentication handler.
+func New(ctrl auth.Controller) Handler {
+	return Handler{
+		ctrl: ctrl,
 	}
 }

@@ -7,11 +7,15 @@ import (
 
 	"asona/internal/constants"
 	"asona/internal/handler/response"
+	"asona/internal/pkg/logger"
 )
 
 type ProfileResponse struct {
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Image    string `json:"image,omitempty"`
 }
 
 // @Summary      Get user profile
@@ -23,15 +27,51 @@ type ProfileResponse struct {
 // @Failure      401  {object} response.Response
 // @Router       /profile [get]
 func (h Handler) Profile(c *gin.Context) {
-	userID, _ := c.Get("userID")
-	email, _ := c.Get("email")
+	val, exists := c.Get("userID")
+	if !exists {
+		logger.ERROR.Printf("[Profile] userID not found in context")
+		c.JSON(http.StatusUnauthorized, response.NewResponse(
+			constants.InvalidToken.Code,
+			constants.InvalidToken.Message,
+			nil,
+		))
+		return
+	}
 
+	userID, ok := val.(int64)
+	if !ok {
+		logger.ERROR.Printf("[Profile] invalid userID type in context: %T", val)
+		c.JSON(http.StatusUnauthorized, response.NewResponse(
+			constants.InvalidToken.Code,
+			constants.InvalidToken.Message,
+			nil,
+		))
+		return
+	}
+
+	user, err := h.ctrl.GetProfile(c.Request.Context(), userID)
+	if err != nil {
+		logger.ERROR.Printf("[Profile] get profile failed for user %d: %+v", userID, err)
+		c.JSON(http.StatusInternalServerError, response.NewResponse(
+			constants.InternalServerError.Code,
+			err.Error(),
+			nil,
+		))
+		return
+	}
+
+	res := ProfileResponse{
+		ID:       user.ID,
+		Name:     user.Name,
+		Username: user.Username,
+		Email:    user.Email,
+		Image:    user.Image,
+	}
+
+	logger.INFO.Printf("[Profile] user profile retrieved successfully: %s", user.Email)
 	c.JSON(http.StatusOK, response.NewResponse(
 		constants.Success.Code,
 		constants.Success.Message,
-		ProfileResponse{
-			UserID: userID.(string),
-			Email:  email.(string),
-		},
+		res,
 	))
 }

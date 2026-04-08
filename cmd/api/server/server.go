@@ -11,7 +11,12 @@ import (
 
 	"asona/config"
 	"asona/internal/controller/auth"
+	ctrlChannel "asona/internal/controller/chat/channel"
+	ctrlMessage "asona/internal/controller/chat/message"
+	"asona/internal/controller/organizations"
 	handlerauth "asona/internal/handler/rest/v1/auth"
+	handlerchat "asona/internal/handler/rest/v1/chat"
+	handlerorg "asona/internal/handler/rest/v1/organizations"
 	handlerws "asona/internal/handler/rest/v1/websocket"
 	"asona/internal/repository"
 	"asona/internal/service/database"
@@ -63,9 +68,16 @@ func NewServer() *http.Server {
 	logger, _ := zap.NewProduction()
 	defer func() { _ = logger.Sync() }()
 
-	// Initialize handlers
+	// Initialize controllers
 	authCtrl := auth.New(repo)
+	orgCtrl := organizations.New(repo)
+	channelCtrl := ctrlChannel.New(repo)
+	messageCtrl := ctrlMessage.New(repo)
+
+	// Initialize handlers
 	authHandler := handlerauth.New(authCtrl)
+	orgHandler := handlerorg.New(orgCtrl)
+	chatHandler := handlerchat.New(channelCtrl, messageCtrl)
 	wsHandler := handlerws.New(s.ws)
 
 	rtr := router{
@@ -74,6 +86,8 @@ func NewServer() *http.Server {
 		rdb:         s.rdb,
 		logger:      logger,
 		authHandler: authHandler,
+		orgHandler:  orgHandler,
+		chatHandler: chatHandler,
 		wsHandler:   wsHandler,
 	}
 

@@ -39,7 +39,7 @@ func New(ctx context.Context, redisClient *redis.Client) Service {
 		},
 	}
 
-	return &service{
+	return service{
 		ctx:      ctx,
 		hub:      hub,
 		upgrader: upgrader,
@@ -47,16 +47,16 @@ func New(ctx context.Context, redisClient *redis.Client) Service {
 }
 
 // Hub returns the WebSocket hub.
-func (s *service) Hub() *Hub {
+func (s service) Hub() *Hub {
 	return s.hub
 }
 
 // Upgrader returns the WebSocket upgrader.
-func (s *service) Upgrader() *websocket.Upgrader {
+func (s service) Upgrader() *websocket.Upgrader {
 	return s.upgrader
 }
 
 // Run starts the WebSocket service.
-func (s *service) Run() {
+func (s service) Run() {
 	go s.hub.Run()
 }

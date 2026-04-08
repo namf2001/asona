@@ -17,6 +17,8 @@ import (
 
 	"asona/internal/handler/middleware"
 	"asona/internal/handler/rest/v1/auth"
+	"asona/internal/handler/rest/v1/chat"
+	"asona/internal/handler/rest/v1/organizations"
 	"asona/internal/handler/rest/v1/websocket"
 	"asona/internal/service/database"
 	"asona/internal/service/redis"
@@ -31,7 +33,9 @@ type router struct {
 	rdb    redis.Service
 	logger *zap.Logger
 
-	authHandler *auth.Handler
+	authHandler auth.Handler
+	orgHandler  organizations.Handler
+	chatHandler chat.Handler
 	wsHandler   *websocket.Handler
 }
 
@@ -87,6 +91,24 @@ func (rtr router) authenticated(r *gin.Engine) {
 	v1.Use(middleware.RSAAuthMiddleware())
 
 	v1.GET("/profile", rtr.authHandler.Profile)
+
+	// Organizations
+	orgs := v1.Group("/organizations")
+	{
+		orgs.POST("", rtr.orgHandler.Create)
+		orgs.GET("/:id", rtr.orgHandler.Get)
+	}
+
+	// Channels
+	channels := v1.Group("/channels")
+	{
+		channels.POST("", rtr.chatHandler.CreateChannel)
+		channels.GET("/:id", rtr.chatHandler.GetChannel)
+		channels.GET("/:id/messages", rtr.chatHandler.ListMessages)
+	}
+
+	// Messages
+	v1.POST("/messages", rtr.chatHandler.SendMessage)
 }
 
 // websocketRoutes registers WebSocket routes.

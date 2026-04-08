@@ -62,9 +62,7 @@ func RSAAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Replace the body with decrypted content for downstream handlers
 		c.Request.Body = io.NopCloser(strings.NewReader(string(decodedBody)))
-
 		c.Next()
 	}
 }
