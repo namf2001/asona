@@ -30,6 +30,16 @@ type LoginResponse struct {
 }
 
 // Login handles user login
+// @Summary      User Login
+// @Description  Authenticate user and return session token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      LoginRequest  true  "Login credentials"
+// @Success      200      {object}  response.Response{data=LoginResponse}
+// @Failure      400      {object}  response.Response
+// @Failure      401      {object}  response.Response
+// @Router       /auth/login [post]
 func (h Handler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

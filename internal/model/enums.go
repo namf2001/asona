@@ -72,6 +72,16 @@ const (
 	TaskPriorityLowest  TaskPriority = "lowest"
 )
 
+// TaskStatus represents task status levels
+type TaskStatus string
+
+const (
+	TaskStatusTodo       TaskStatus = "todo"
+	TaskStatusInProgress TaskStatus = "in_progress"
+	TaskStatusDone       TaskStatus = "done"
+	TaskStatusBacklog    TaskStatus = "backlog"
+)
+
 // TaskLinkType represents the type of relation between tasks
 type TaskLinkType string
 

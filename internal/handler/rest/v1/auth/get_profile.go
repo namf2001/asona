@@ -10,7 +10,7 @@ import (
 	"asona/internal/pkg/logger"
 )
 
-type ProfileResponse struct {
+type GetProfileResponse struct {
 	ID       int64  `json:"id"`
 	Name     string `json:"name"`
 	Username string `json:"username"`
@@ -18,14 +18,15 @@ type ProfileResponse struct {
 	Image    string `json:"image,omitempty"`
 }
 
+// Profile handles GET /auth/profile
 // @Summary      Get user profile
 // @Description  Get the profile of the currently authenticated user
 // @Tags         auth
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200  {object} response.Response
+// @Success      200  {object} response.Response{data=GetProfileResponse}
 // @Failure      401  {object} response.Response
-// @Router       /profile [get]
+// @Router       /auth/profile [get]
 func (h Handler) Profile(c *gin.Context) {
 	val, exists := c.Get("userID")
 	if !exists {
@@ -60,7 +61,7 @@ func (h Handler) Profile(c *gin.Context) {
 		return
 	}
 
-	res := ProfileResponse{
+	res := GetProfileResponse{
 		ID:       user.ID,
 		Name:     user.Name,
 		Username: user.Username,

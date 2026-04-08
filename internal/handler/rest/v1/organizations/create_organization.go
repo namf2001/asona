@@ -12,13 +12,13 @@ import (
 	"asona/internal/pkg/logger"
 )
 
-type CreateRequest struct {
+type CreateOrganizationRequest struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 	LogoURL     string `json:"logo_url"`
 }
 
-type OrganizationResponse struct {
+type CreateOrganizationResponse struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -27,11 +27,23 @@ type OrganizationResponse struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-// Create handles POST /api/v1/organizations
-func (h Handler) Create(c *gin.Context) {
-	var req CreateRequest
+// CreateOrganization handles POST /api/v1/organizations
+// @Summary      Create Organization
+// @Description  Create a new organization and assign the creator as ADMIN
+// @Tags         organizations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      CreateOrganizationRequest  true  "Organization details"
+// @Success      201      {object}  response.Response{data=CreateOrganizationResponse}
+// @Failure      400      {object}  response.Response
+// @Failure      401      {object}  response.Response
+// @Failure      500      {object}  response.Response
+// @Router       /organizations [post]
+func (h Handler) CreateOrganization(c *gin.Context) {
+	var req CreateOrganizationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		logger.ERROR.Printf("[Create] failed request param: %+v", err)
+		logger.ERROR.Printf("[CreateOrganization] failed request param: %+v", err)
 		c.JSON(http.StatusBadRequest, response.NewResponse(
 			constants.InvalidRequestParams.Code,
 			constants.InvalidRequestParams.Message,
@@ -42,7 +54,7 @@ func (h Handler) Create(c *gin.Context) {
 
 	userID, exists := c.Get("userID")
 	if !exists {
-		logger.ERROR.Printf("[Create] userID not found in context")
+		logger.ERROR.Printf("[CreateOrganization] userID not found in context")
 		c.JSON(http.StatusUnauthorized, response.NewResponse(
 			constants.InvalidToken.Code,
 			constants.InvalidToken.Message,
@@ -58,7 +70,7 @@ func (h Handler) Create(c *gin.Context) {
 		LogoURL:     req.LogoURL,
 	})
 	if err != nil {
-		logger.ERROR.Printf("[Create] create failed for user %d: %+v", uid, err)
+		logger.ERROR.Printf("[CreateOrganization] create failed for user %d: %+v", uid, err)
 		c.JSON(http.StatusInternalServerError, response.NewResponse(
 			constants.CreateOrganizationFail.Code,
 			err.Error(),
@@ -67,11 +79,11 @@ func (h Handler) Create(c *gin.Context) {
 		return
 	}
 
-	logger.INFO.Printf("[Create] organization created successfully: %s (ID: %d)", org.Name, org.ID)
+	logger.INFO.Printf("[CreateOrganization] organization created successfully: %s (ID: %d)", org.Name, org.ID)
 	c.JSON(http.StatusCreated, response.NewResponse(
 		constants.Success.Code,
 		"Organization created",
-		OrganizationResponse{
+		CreateOrganizationResponse{
 			ID:          org.ID,
 			Name:        org.Name,
 			Description: org.Description,

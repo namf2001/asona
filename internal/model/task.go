@@ -9,7 +9,8 @@ import (
 type Task struct {
 	ID          int64        `json:"id,omitempty"          db:"id"`
 	ProjectID   int64        `json:"project_id,omitempty"  db:"project_id"`
-	StatusID    int64        `json:"status_id,omitempty"   db:"status_id"`
+	Status      string       `json:"status,omitempty"      db:"status"`
+	AssigneeID  int64        `json:"assignee_id,omitempty" db:"assignee_id"`
 	ParentID    int64        `json:"parent_id,omitempty"   db:"parent_id"` // Subtask support
 	Title       string       `json:"title,omitempty"       db:"title"`
 	Description string       `json:"description,omitempty" db:"description"`

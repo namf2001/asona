@@ -27,6 +27,16 @@ type RegisterResponse struct {
 }
 
 // Register handles user registration
+// @Summary      User Registration
+// @Description  Register a new user in the system
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      RegisterRequest  true  "Registration details"
+// @Success      201      {object}  response.Response{data=RegisterResponse}
+// @Failure      400      {object}  response.Response
+// @Failure      500      {object}  response.Response
+// @Router       /auth/register [post]
 func (h Handler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

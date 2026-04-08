@@ -14,9 +14,13 @@ import (
 	ctrlChannel "asona/internal/controller/chat/channel"
 	ctrlMessage "asona/internal/controller/chat/message"
 	"asona/internal/controller/organizations"
+	"asona/internal/controller/projects"
+	"asona/internal/controller/tasks"
 	handlerauth "asona/internal/handler/rest/v1/auth"
 	handlerchat "asona/internal/handler/rest/v1/chat"
 	handlerorg "asona/internal/handler/rest/v1/organizations"
+	handlerproj "asona/internal/handler/rest/v1/projects"
+	handlertask "asona/internal/handler/rest/v1/tasks"
 	handlerws "asona/internal/handler/rest/v1/websocket"
 	"asona/internal/repository"
 	"asona/internal/service/database"
@@ -73,11 +77,15 @@ func NewServer() *http.Server {
 	orgCtrl := organizations.New(repo)
 	channelCtrl := ctrlChannel.New(repo)
 	messageCtrl := ctrlMessage.New(repo)
+	projCtrl := projects.New(repo)
+	taskCtrl := tasks.New(repo)
 
 	// Initialize handlers
 	authHandler := handlerauth.New(authCtrl)
 	orgHandler := handlerorg.New(orgCtrl)
 	chatHandler := handlerchat.New(channelCtrl, messageCtrl)
+	projHandler := handlerproj.New(projCtrl)
+	taskHandler := handlertask.New(taskCtrl)
 	wsHandler := handlerws.New(s.ws)
 
 	rtr := router{
@@ -88,6 +96,8 @@ func NewServer() *http.Server {
 		authHandler: authHandler,
 		orgHandler:  orgHandler,
 		chatHandler: chatHandler,
+		projHandler: projHandler,
+		taskHandler: taskHandler,
 		wsHandler:   wsHandler,
 	}
 

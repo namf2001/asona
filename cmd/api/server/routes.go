@@ -19,6 +19,8 @@ import (
 	"asona/internal/handler/rest/v1/auth"
 	"asona/internal/handler/rest/v1/chat"
 	"asona/internal/handler/rest/v1/organizations"
+	"asona/internal/handler/rest/v1/projects"
+	"asona/internal/handler/rest/v1/tasks"
 	"asona/internal/handler/rest/v1/websocket"
 	"asona/internal/service/database"
 	"asona/internal/service/redis"
@@ -36,6 +38,8 @@ type router struct {
 	authHandler auth.Handler
 	orgHandler  organizations.Handler
 	chatHandler chat.Handler
+	projHandler projects.Handler
+	taskHandler tasks.Handler
 	wsHandler   *websocket.Handler
 }
 
@@ -95,8 +99,8 @@ func (rtr router) authenticated(r *gin.Engine) {
 	// Organizations
 	orgs := v1.Group("/organizations")
 	{
-		orgs.POST("", rtr.orgHandler.Create)
-		orgs.GET("/:id", rtr.orgHandler.Get)
+		orgs.POST("", rtr.orgHandler.CreateOrganization)
+		orgs.GET("/:id", rtr.orgHandler.GetOrganization)
 	}
 
 	// Channels
@@ -105,6 +109,22 @@ func (rtr router) authenticated(r *gin.Engine) {
 		channels.POST("", rtr.chatHandler.CreateChannel)
 		channels.GET("/:id", rtr.chatHandler.GetChannel)
 		channels.GET("/:id/messages", rtr.chatHandler.ListMessages)
+	}
+
+	projs := v1.Group("/projects")
+	{
+		projs.POST("", rtr.projHandler.CreateProject)
+		projs.GET("/:id", rtr.projHandler.GetProject)
+		projs.GET("/:id/tasks", rtr.taskHandler.ListTasks)
+	}
+	v1.GET("/workplaces/:id/projects", rtr.projHandler.ListProjects)
+
+	// Tasks
+	taskGroup := v1.Group("/tasks")
+	{
+		taskGroup.POST("", rtr.taskHandler.CreateTask)
+		taskGroup.GET("/:id", rtr.taskHandler.GetTask)
+		taskGroup.PUT("/:id", rtr.taskHandler.UpdateTask)
 	}
 
 	// Messages

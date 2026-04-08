@@ -15,6 +15,15 @@ type Repository interface {
 	GetByID(ctx context.Context, id int64) (model.Task, error)
 	// Update updates an existing task's information.
 	Update(ctx context.Context, task model.Task) error
+	// List retrieves tasks with filtering.
+	List(ctx context.Context, filter ListFilter) ([]model.Task, error)
+}
+
+// ListFilter represents criteria for filtering tasks.
+type ListFilter struct {
+	ProjectID int64
+	Assignee  int64
+	Status    string
 }
 
 type impl struct {

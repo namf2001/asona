@@ -15,6 +15,13 @@ type Repository interface {
 	GetByID(ctx context.Context, id int64) (model.Project, error)
 	// AddMember adds a existing user as a member of a project.
 	AddMember(ctx context.Context, member model.ProjectMember) error
+	// List retrieves projects with filtering.
+	List(ctx context.Context, filter ListFilter) ([]model.Project, error)
+}
+
+// ListFilter represents criteria for filtering projects.
+type ListFilter struct {
+	WorkplaceID int64
 }
 
 type impl struct {

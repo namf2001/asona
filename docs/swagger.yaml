@@ -1,0 +1,1120 @@
+basePath: /api/v1
+definitions:
+  auth.GetProfileResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.LoginResponse:
+    properties:
+      session_token:
+        type: string
+      user:
+        $ref: '#/definitions/auth.LoginUserResponse'
+    type: object
+  auth.LoginUserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  auth.RegisterResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  chat.CreateChannelRequest:
+    properties:
+      name:
+        type: string
+      project_id:
+        type: integer
+      type:
+        type: string
+      workplace_id:
+        type: integer
+    required:
+    - name
+    - type
+    - workplace_id
+    type: object
+  chat.CreateChannelResponse:
+    properties:
+      created_by:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      project_id:
+        type: integer
+      type:
+        type: string
+      workplace_id:
+        type: integer
+    type: object
+  chat.GetChannelResponse:
+    properties:
+      created_by:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      project_id:
+        type: integer
+      type:
+        type: string
+      workplace_id:
+        type: integer
+    type: object
+  chat.ListMessagesResponse:
+    properties:
+      channel_id:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_edited:
+        type: boolean
+      parent_id:
+        type: integer
+      sender_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  chat.SendMessageRequest:
+    properties:
+      channel_id:
+        type: integer
+      content:
+        type: string
+      parent_id:
+        type: integer
+    required:
+    - channel_id
+    - content
+    type: object
+  chat.SendMessageResponse:
+    properties:
+      channel_id:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_edited:
+        type: boolean
+      parent_id:
+        type: integer
+      sender_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  internal_handler_rest_v1_organizations.OrganizationWithRoleResponse:
+    properties:
+      id:
+        type: integer
+      joined_at:
+        type: string
+      logo_url:
+        type: string
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/model.OrgRole'
+    type: object
+  model.OrgRole:
+    enum:
+    - admin
+    - sub_admin
+    - member
+    type: string
+    x-enum-varnames:
+    - OrgRoleAdmin
+    - OrgRoleSubAdmin
+    - OrgRoleMember
+  organizations.CreateOrganizationRequest:
+    properties:
+      description:
+        type: string
+      logo_url:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  organizations.CreateOrganizationResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      logo_url:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  organizations.GetOrganizationResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      logo_url:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  projects.CreateProjectRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      workplace_id:
+        type: integer
+    required:
+    - name
+    - workplace_id
+    type: object
+  projects.CreateProjectResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      workplace_id:
+        type: integer
+    type: object
+  projects.GetProjectResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      workplace_id:
+        type: integer
+    type: object
+  projects.ListProjectsResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+      workplace_id:
+        type: integer
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: string
+      data: {}
+      message:
+        type: string
+    type: object
+  tasks.CreateTaskRequest:
+    properties:
+      assignee_id:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      priority:
+        type: string
+      project_id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+    required:
+    - project_id
+    - title
+    type: object
+  tasks.CreateTaskResponse:
+    properties:
+      assignee_id:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      priority:
+        type: string
+      project_id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  tasks.GetTaskResponse:
+    properties:
+      assignee_id:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      priority:
+        type: string
+      project_id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  tasks.ListTasksResponse:
+    properties:
+      assignee_id:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      priority:
+        type: string
+      project_id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  tasks.UpdateTaskRequest:
+    properties:
+      assignee_id:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      priority:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  tasks.UpdateTaskResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API server for DPC Tools.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: DPC Tools API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return session token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User Login
+      tags:
+      - auth
+  /auth/profile:
+    get:
+      description: Get the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.GetProfileResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user in the system
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.RegisterResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User Registration
+      tags:
+      - auth
+  /channels:
+    post:
+      consumes:
+      - application/json
+      description: Create a new chat channel within a workplace or project
+      parameters:
+      - description: Channel details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chat.CreateChannelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/chat.CreateChannelResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create Chat Channel
+      tags:
+      - chat
+  /channels/{id}:
+    get:
+      description: Retrieve details of a specific chat channel by its ID
+      parameters:
+      - description: Channel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/chat.GetChannelResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get Chat Channel
+      tags:
+      - chat
+  /channels/{id}/messages:
+    get:
+      description: Retrieve paginated messages for a specific chat channel
+      parameters:
+      - description: Channel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Limit (default 50)
+        in: query
+        name: limit
+        type: integer
+      - description: Offset (default 0)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/chat.ListMessagesResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List Chat Messages
+      tags:
+      - chat
+  /messages:
+    post:
+      consumes:
+      - application/json
+      description: Send a new chat message to a specific channel
+      parameters:
+      - description: Message details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chat.SendMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/chat.SendMessageResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Send Chat Message
+      tags:
+      - chat
+  /organizations:
+    get:
+      description: Retrieve all organizations the current user is a member of
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_handler_rest_v1_organizations.OrganizationWithRoleResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List Organizations by User
+      tags:
+      - organizations
+    post:
+      consumes:
+      - application/json
+      description: Create a new organization and assign the creator as ADMIN
+      parameters:
+      - description: Organization details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/organizations.CreateOrganizationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/organizations.CreateOrganizationResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create Organization
+      tags:
+      - organizations
+  /organizations/{id}:
+    get:
+      description: Retrieve details of a specific organization by its ID
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/organizations.GetOrganizationResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get Organization
+      tags:
+      - organizations
+  /projects:
+    post:
+      consumes:
+      - application/json
+      description: Create a new project in a specific workplace
+      parameters:
+      - description: Project details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/projects.CreateProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/projects.CreateProjectResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create Project
+      tags:
+      - projects
+  /projects/{id}:
+    get:
+      description: Retrieve details of a specific project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/projects.GetProjectResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get Project
+      tags:
+      - projects
+  /projects/{id}/tasks:
+    get:
+      description: Retrieve all tasks within a specific project
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/tasks.ListTasksResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List Tasks
+      tags:
+      - tasks
+  /tasks:
+    post:
+      consumes:
+      - application/json
+      description: Create a new task in a specific project
+      parameters:
+      - description: Task details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/tasks.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/tasks.CreateTaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Create Task
+      tags:
+      - tasks
+  /tasks/{id}:
+    get:
+      description: Retrieve details of a specific task by its ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/tasks.GetTaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Get Task
+      tags:
+      - tasks
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing task
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated task details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/tasks.UpdateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/tasks.UpdateTaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Update Task
+      tags:
+      - tasks
+  /workplaces/{id}/projects:
+    get:
+      description: Retrieve all projects within a specific workplace
+      parameters:
+      - description: Workplace ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/projects.ListProjectsResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: List Projects
+      tags:
+      - projects
+  /ws:
+    get:
+      consumes:
+      - application/json
+      description: Establishes a WebSocket connection for real-time communication
+      parameters:
+      - description: User ID
+        in: query
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: WebSocket Connection
+      tags:
+      - WebSocket
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
