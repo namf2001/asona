@@ -1,11 +1,13 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"asona/internal/constants"
+	authctrl "asona/internal/controller/auth"
 	"asona/internal/handler/response"
 	"asona/internal/pkg/logger"
 )
@@ -53,9 +55,18 @@ func (h Handler) Profile(c *gin.Context) {
 	user, err := h.ctrl.GetProfile(c.Request.Context(), userID)
 	if err != nil {
 		logger.ERROR.Printf("[Profile] get profile failed for user %d: %+v", userID, err)
+		if errors.Is(err, authctrl.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, response.NewResponse(
+				constants.UserNotFound.Code,
+				constants.UserNotFound.Message,
+				nil,
+			))
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, response.NewResponse(
 			constants.InternalServerError.Code,
-			err.Error(),
+			constants.InternalServerError.Message,
 			nil,
 		))
 		return

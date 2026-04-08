@@ -1,10 +1,14 @@
 package users
 
 import (
-	"asona/internal/model"
 	"context"
+	"errors"
 	"fmt"
+
+	"github.com/lib/pq"
 	pkgerrors "github.com/pkg/errors"
+
+	"asona/internal/model"
 )
 
 func (i impl) Create(ctx context.Context, user model.User) (model.User, error) {
@@ -26,6 +30,10 @@ func (i impl) Create(ctx context.Context, user model.User) (model.User, error) {
 	).Scan(&user.ID)
 
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return model.User{}, pkgerrors.WithStack(ErrEmailAlreadyExists)
+		}
 		return model.User{}, pkgerrors.WithStack(fmt.Errorf("failed to create user: %w", err))
 	}
 

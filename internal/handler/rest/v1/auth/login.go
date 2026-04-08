@@ -1,11 +1,13 @@
 package auth
 
 import (
-	"asona/internal/controller/auth"
-	"asona/internal/constants"
-	"asona/internal/handler/response"
+	"errors"
 	"net/http"
+	"strings"
 
+	"asona/internal/constants"
+	"asona/internal/controller/auth"
+	"asona/internal/handler/response"
 	"asona/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -53,23 +55,34 @@ func (h Handler) Login(c *gin.Context) {
 	}
 
 	user, token, err := h.ctrl.Login(c.Request.Context(), auth.LoginInput{
-		Email:    req.Email,
-		Password: req.Password,
+		Email:     req.Email,
+		Password:  req.Password,
+		UserAgent: c.Request.UserAgent(),
+		IPAddress: clientIP(c),
 	})
 	if err != nil {
 		logger.ERROR.Printf("[Login] login failed for user %s: %+v", req.Email, err)
-		c.JSON(http.StatusUnauthorized, response.NewResponse(
-			constants.LoginFail.Code,
-			err.Error(),
+		if errors.Is(err, auth.ErrUserNotFound) || errors.Is(err, auth.ErrInvalidPassword) {
+			c.JSON(http.StatusUnauthorized, response.NewResponse(
+				constants.LoginFail.Code,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, response.NewResponse(
+			constants.InternalServerError.Code,
+			constants.InternalServerError.Message,
 			nil,
 		))
 		return
 	}
 
 	// Assuming controller now returns model.User or auth.UserResponse
-	// If it returns model.User, we need to map it. 
+	// If it returns model.User, we need to map it.
 	// Based on previous edits, get_profile returns model.User, but I defined UserResponse in controller.
-	// Let's assume we map to the controller's public response type if needed, 
+	// Let's assume we map to the controller's public response type if needed,
 	// but the handler should have its own response struct.
 
 	logger.INFO.Printf("[Login] user logged in successfully: %s", user.Email)
@@ -87,4 +100,12 @@ func (h Handler) Login(c *gin.Context) {
 			SessionToken: token,
 		},
 	))
+}
+
+func clientIP(c *gin.Context) string {
+	ip := strings.TrimSpace(c.ClientIP())
+	if ip == "" {
+		return ""
+	}
+	return ip
 }

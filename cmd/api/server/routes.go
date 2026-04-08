@@ -86,7 +86,10 @@ func (rtr router) public(r *gin.Engine) {
 
 	// api/v1 public routes
 	v1 := r.Group("/api/v1")
+	v1.POST("/register", middleware.RSAAuthMiddleware(), rtr.authHandler.Register)
 	v1.POST("/login", middleware.RSAAuthMiddleware(), rtr.authHandler.Login)
+	v1.GET("/auth/google", rtr.authHandler.GoogleLogin)
+	v1.GET("/auth/google/callback", rtr.authHandler.GoogleCallback)
 }
 
 func (rtr router) authenticated(r *gin.Engine) {
@@ -95,6 +98,7 @@ func (rtr router) authenticated(r *gin.Engine) {
 	v1.Use(middleware.RSAAuthMiddleware())
 
 	v1.GET("/profile", rtr.authHandler.Profile)
+	v1.POST("/logout", rtr.authHandler.Logout)
 
 	// Organizations
 	orgs := v1.Group("/organizations")

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"asona/internal/model"
 	"asona/internal/repository/users"
 
@@ -21,17 +23,18 @@ type RegisterInput struct {
 
 // Register creates a new user account in the system.
 func (i impl) Register(ctx context.Context, input RegisterInput) (model.User, error) {
-	// 1. Hash password (omitted for brevity, assume bcrypt)
-	hashedPassword := input.Password 
+	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return model.User{}, pkgerrors.WithStack(fmt.Errorf("failed to hash password: %w", err))
+	}
 
 	user := model.User{
 		Name:     input.Name,
 		Username: input.Username,
 		Email:    input.Email,
-		Password: hashedPassword,
+		Password: string(hashedPasswordBytes),
 	}
 
-	// 2. Map to repository
 	createdUser, err := i.repo.User().Create(ctx, user)
 	if err != nil {
 		if errors.Is(err, users.ErrEmailAlreadyExists) {

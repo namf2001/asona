@@ -1,11 +1,12 @@
 package auth
 
 import (
-	"asona/internal/controller/auth"
-	"asona/internal/constants"
-	"asona/internal/handler/response"
+	"errors"
 	"net/http"
 
+	"asona/internal/constants"
+	"asona/internal/controller/auth"
+	"asona/internal/handler/response"
 	"asona/internal/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -57,9 +58,18 @@ func (h Handler) Register(c *gin.Context) {
 	})
 	if err != nil {
 		logger.ERROR.Printf("[Register] registration failed for user %s: %+v", req.Email, err)
+		if errors.Is(err, auth.ErrUserAlreadyExists) {
+			c.JSON(http.StatusConflict, response.NewResponse(
+				constants.EmailExists.Code,
+				err.Error(),
+				nil,
+			))
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, response.NewResponse(
 			constants.RegisterUserFail.Code,
-			err.Error(),
+			constants.RegisterUserFail.Message,
 			nil,
 		))
 		return
