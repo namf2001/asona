@@ -116,4 +116,9 @@ migrate-status:
 	@echo "Migration files in $(MIGRATIONS_DIR)/:"
 	@ls $(MIGRATIONS_DIR)/*.sql | sort -V
 
-.PHONY: all build run test clean clear watch be-dev docker-run docker-down docker-db-run docker-db-down itest migrate-up migrate-down migrate-status swagger
+# Seed database with sample data
+seed:
+	@echo "🌱 Seeding database..."
+	@go run cmd/seed/main.go
+
+.PHONY: all build run test clean clear watch be-dev docker-run docker-down docker-db-run docker-db-down itest migrate-up migrate-down migrate-status swagger seed
