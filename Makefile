@@ -18,19 +18,19 @@ run:
 
 # Start all containers (app + postgres + redis + frontend)
 docker-run:
-	@docker compose up --build
+	@docker compose -f build/docker-compose.yml --project-directory . up --build
 
 # Start only infrastructure services (postgres + redis)
 docker-db-run:
-	@docker compose up -d postgres redis
+	@docker compose -f build/docker-compose.yml --project-directory . up -d postgres redis
 
 # Stop only infrastructure services (postgres + redis)
 docker-db-down:
-	@docker compose stop postgres redis
+	@docker compose -f build/docker-compose.yml --project-directory . stop postgres redis
 
 # Shutdown all containers
 docker-down:
-	@docker compose down
+	@docker compose -f build/docker-compose.yml --project-directory . down
 
 # Test the application
 test:
