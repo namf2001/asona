@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
       target: prod
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - ${PORT}:${PORT}
     environment:

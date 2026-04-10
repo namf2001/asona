@@ -27,9 +27,19 @@ Create DB container
 make docker-run
 ```
 
+Create only Postgres + Redis containers
+```bash
+make docker-db-run
+```
+
 Shutdown DB Container
 ```bash
 make docker-down
+```
+
+Stop only Postgres + Redis containers
+```bash
+make docker-db-down
 ```
 
 DB Integrations Test:

@@ -20,6 +20,14 @@ run:
 docker-run:
 	@docker compose up --build
 
+# Start only infrastructure services (postgres + redis)
+docker-db-run:
+	@docker compose up -d postgres redis
+
+# Stop only infrastructure services (postgres + redis)
+docker-db-down:
+	@docker compose stop postgres redis
+
 # Shutdown all containers
 docker-down:
 	@docker compose down
@@ -108,4 +116,4 @@ migrate-status:
 	@echo "Migration files in $(MIGRATIONS_DIR)/:"
 	@ls $(MIGRATIONS_DIR)/*.sql | sort -V
 
-.PHONY: all build run test clean clear watch be-dev docker-run docker-down itest migrate-up migrate-down migrate-status swagger
+.PHONY: all build run test clean clear watch be-dev docker-run docker-down docker-db-run docker-db-down itest migrate-up migrate-down migrate-status swagger

@@ -28,10 +28,9 @@ COPY frontend/. .
 RUN pnpm run build
 
 FROM node:20-alpine AS frontend
-RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm add -g serve
-COPY --from=frontend_builder /frontend/.next /app/.next
-COPY --from=frontend_builder /frontend/public /app/public
-COPY --from=frontend_builder /frontend/package.json /app/package.json
 WORKDIR /app
+COPY --from=frontend_builder /frontend/.next/standalone ./
+COPY --from=frontend_builder /frontend/.next/static ./.next/static
+COPY --from=frontend_builder /frontend/public /app/public
 EXPOSE 3000
-CMD ["serve", "-s", "/app/.next", "-l", "3000"]
+CMD ["node", "server.js"]
