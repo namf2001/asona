@@ -30,15 +30,31 @@ export default function AuthLayout({
         
         {/* Left Side: Illustration & Logo */}
         <div className="w-full lg:w-[55%] flex flex-col relative p-8 lg:p-16">
-          <div className="flex items-center gap-2 z-10">
-            <Image 
-              src={AsonaLogo} 
-              alt="Asona Logo" 
-              width={80} 
-              height={80} 
-              className="object-contain w-16 h-16 lg:w-20 lg:h-20"
-              priority
-            />
+          <div className="flex items-center gap-[18px] z-10">
+            {/* Logo Wrapper */}
+            <div className="relative w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+              {/* Specialized Background Layer (prevents image resizing issues) */}
+              <div 
+                className="absolute inset-0 rounded-[28px] shadow-[0_12px_30px_-10px_rgba(0,0,0,0.2)] border border-white/50"
+                style={{ background: 'linear-gradient(40deg, #ffffff 0%, #f3f4f6 100%)' }}
+              />
+              
+              {/* Logo Image Layer */}
+              <div className="relative z-10">
+                <Image 
+                  src={AsonaLogo} 
+                  alt="Asona Logo" 
+                  width={44} 
+                  height={44} 
+                  className="object-contain lg:w-[52px] lg:h-[52px]"
+                  priority
+                />
+              </div>
+            </div>
+
+            <h2 className="text-[42px] text-white font-semibold flex items-baseline">
+              Asona<span className="font-bold">.ai</span>
+            </h2>
           </div>
 
           <div className="flex-1 w-full relative min-h-[400px] hidden lg:flex items-center justify-center">
