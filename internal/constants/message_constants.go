@@ -9,8 +9,10 @@ var (
 	// Success
 	Success             = ResponseCode{"00", "Success"}
 	LoginSuccess        = ResponseCode{"INF003", "Login success"}
-	RegisterUserSuccess = ResponseCode{"INF001", "Register user success"}
-	LogoutSuccess       = ResponseCode{"INF004", "Logout success"}
+	RegisterUserSuccess           = ResponseCode{"INF001", "Register user success"}
+	LogoutSuccess                 = ResponseCode{"INF004", "Logout success"}
+	SendEmailRegisterSuccess      = ResponseCode{"INF009", "Send email register success"}
+	EmailVerifiedSuccess          = ResponseCode{"INF061", "Email verified successfully"}
 
 	// General Errors
 	InternalServerError  = ResponseCode{"ERR500", "Internal server error"}
@@ -26,6 +28,7 @@ var (
 	PasswordIncorrect          = ResponseCode{"ERR005", "The password is incorrect"}
 	LoginFail                  = ResponseCode{"ERR006", "Login fail, something wrong"}
 	RegisterUserFail           = ResponseCode{"ERR007", "Register user fail, something wrong"}
+	VerifyCodeExpired          = ResponseCode{"ERR014", "Verify code expired"}
 	PermissionDenied           = ResponseCode{"ERR030", "Permission denied, you can't perform this action"}
 
 	// Chat / Room / Channel errors

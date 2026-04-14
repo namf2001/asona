@@ -16,6 +16,7 @@ type EnvConfig struct {
 	// App
 	AppPort string `envconfig:"PORT"    default:"8080"`
 	AppEnv  string `envconfig:"APP_ENV" default:"local"`
+	FrontendURL string `envconfig:"FRONTEND_URL" default:"http://localhost:3000"`
 
 	// DB
 	DBHost         string `envconfig:"DB_HOST"           required:"true"`

@@ -16,6 +16,7 @@ import (
 	"asona/internal/repository/sessions"
 	"asona/internal/repository/tasks"
 	"asona/internal/repository/users"
+	"asona/internal/repository/verification_tokens"
 	"asona/internal/repository/workplaces"
 )
 
@@ -28,6 +29,8 @@ type Registry interface {
 	Account() accounts.Repository
 	// Session return session repository
 	Session() sessions.Repository
+	// VerificationToken return verification token repository
+	VerificationToken() verification_tokens.Repository
 	// Organization return organization repository
 	Organization() organizations.Repository
 	// Workplace return workplace repository
@@ -48,11 +51,12 @@ type Registry interface {
 func New(db pg.BeginnerExecutor) Registry {
 	return impl{
 		pgConn:        db,
-		users:         users.New(db),
-		accounts:      accounts.New(db),
-		sessions:      sessions.New(db),
-		organizations: organizations.New(db),
-		workplaces:    workplaces.New(db),
+		users:              users.New(db),
+		accounts:           accounts.New(db),
+		sessions:           sessions.New(db),
+		verificationTokens: verification_tokens.New(db),
+		organizations:      organizations.New(db),
+		workplaces:         workplaces.New(db),
 		projects:      projects.New(db),
 		tasks:         tasks.New(db),
 		channels:      repoChannel.New(db),
@@ -63,11 +67,12 @@ func New(db pg.BeginnerExecutor) Registry {
 type impl struct {
 	pgConn        pg.BeginnerExecutor // Used to start DB transactions
 	tx            pg.ContextExecutor  // Non-nil when inside a transaction
-	users         users.Repository
-	accounts      accounts.Repository
-	sessions      sessions.Repository
-	organizations organizations.Repository
-	workplaces    workplaces.Repository
+	users              users.Repository
+	accounts           accounts.Repository
+	sessions           sessions.Repository
+	verificationTokens verification_tokens.Repository
+	organizations      organizations.Repository
+	workplaces         workplaces.Repository
 	projects      projects.Repository
 	tasks         tasks.Repository
 	channels      repoChannel.Repository
@@ -84,6 +89,10 @@ func (i impl) Account() accounts.Repository {
 
 func (i impl) Session() sessions.Repository {
 	return i.sessions
+}
+
+func (i impl) VerificationToken() verification_tokens.Repository {
+	return i.verificationTokens
 }
 
 func (i impl) Organization() organizations.Repository {
@@ -128,11 +137,12 @@ func (i impl) DoInTx(
 	return pg.TxWithBackOff(ctx, overrideBackoffPolicy, i.pgConn, func(tx pg.ContextExecutor) error {
 		newI := impl{
 			tx:            tx,
-			users:         users.New(tx),
-			accounts:      accounts.New(tx),
-			sessions:      sessions.New(tx),
-			organizations: organizations.New(tx),
-			workplaces:    workplaces.New(tx),
+			users:              users.New(tx),
+			accounts:           accounts.New(tx),
+			sessions:           sessions.New(tx),
+			verificationTokens: verification_tokens.New(tx),
+			organizations:      organizations.New(tx),
+			workplaces:         workplaces.New(tx),
 			projects:      projects.New(tx),
 			tasks:         tasks.New(tx),
 			channels:      repoChannel.New(tx),

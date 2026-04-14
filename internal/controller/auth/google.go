@@ -8,7 +8,11 @@ import (
 	"net/http"
 	"strings"
 
+	"time"
+
+	"asona/config"
 	"asona/internal/model"
+	"asona/internal/pkg/jwt"
 	"asona/internal/repository"
 	"asona/internal/repository/accounts"
 	"asona/internal/repository/users"
@@ -70,8 +74,25 @@ func (i impl) GoogleCallback(ctx context.Context, code string) (model.User, stri
 			if err != nil {
 				return err
 			}
-			sessionToken, err = i.issueSession(ctx, user, "", "")
-			return err
+			sessionToken, err = jwt.GenerateToken(user.ID, user.Email)
+			if err != nil {
+				return pkgerrors.WithStack(fmt.Errorf("failed to generate token: %w", err))
+			}
+
+			accessDuration := config.GetConfig().JWTAccessDuration
+			if accessDuration == 0 {
+				accessDuration = time.Hour
+			}
+
+			_, err = txRepo.Session().Create(ctx, model.Session{
+				UserID:       user.ID,
+				SessionToken: sessionToken,
+				ExpiresAt:    time.Now().Add(accessDuration),
+			})
+			if err != nil {
+				return err
+			}
+			return nil
 		}
 		if !errors.Is(err, accounts.ErrAccountNotFound) {
 			return err
@@ -113,7 +134,21 @@ func (i impl) GoogleCallback(ctx context.Context, code string) (model.User, stri
 			}
 		}
 
-		sessionToken, err = i.issueSession(ctx, user, "", "")
+		sessionToken, err = jwt.GenerateToken(user.ID, user.Email)
+		if err != nil {
+			return pkgerrors.WithStack(fmt.Errorf("failed to generate token: %w", err))
+		}
+
+		accessDuration := config.GetConfig().JWTAccessDuration
+		if accessDuration == 0 {
+			accessDuration = time.Hour
+		}
+
+		_, err = txRepo.Session().Create(ctx, model.Session{
+			UserID:       user.ID,
+			SessionToken: sessionToken,
+			ExpiresAt:    time.Now().Add(accessDuration),
+		})
 		return err
 	}, nil)
 	if err != nil {

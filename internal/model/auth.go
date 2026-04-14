@@ -27,3 +27,10 @@ type Session struct {
 	IPAddress    string     `json:"ip_address,omitempty"      db:"ip_address"`
 	CreatedAt    time.Time  `json:"created_at,omitempty"      db:"created_at"`
 }
+
+// VerificationToken represents a short-lived token used for verification purposes
+type VerificationToken struct {
+	Identifier string    `json:"identifier" db:"identifier"`
+	Token      string    `json:"token"      db:"token"`
+	Expires    time.Time `json:"expires"    db:"expires"`
+}

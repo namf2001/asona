@@ -73,7 +73,7 @@ func NewServer() *http.Server {
 	defer func() { _ = logger.Sync() }()
 
 	// Initialize controllers
-	authCtrl := auth.New(repo, s.oauth)
+	authCtrl := auth.New(repo, s.oauth, s.mail)
 	orgCtrl := organizations.New(repo)
 	channelCtrl := ctrlChannel.New(repo)
 	messageCtrl := ctrlMessage.New(repo)

@@ -12,6 +12,9 @@ var (
 	// ErrUserAlreadyExists is returned when an email/username is already taken.
 	ErrUserAlreadyExists = errors.New("registration failed: email already exists")
 
+	// ErrWrongOTP is returned when the OTP provided is invalid or expired.
+	ErrWrongOTP = errors.New("registration failed: wrong or expired otp")
+
 	// ErrSessionNotFound is returned when the target session does not exist.
 	ErrSessionNotFound = errors.New("session not found")
 

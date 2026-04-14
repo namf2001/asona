@@ -4,11 +4,13 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
+	"asona/config"
 	"asona/internal/constants"
 	authctrl "asona/internal/controller/auth"
 	"asona/internal/handler/response"
@@ -16,6 +18,11 @@ import (
 )
 
 const oauthStateSessionKey = "google_oauth_state"
+
+// GoogleLoginResponse represents the payload containing the OAuth URL
+type GoogleLoginResponse struct {
+	URL string `json:"url"`
+}
 
 // GoogleLogin starts the Google OAuth flow by redirecting the user to Google.
 // @Summary      Google OAuth Login
@@ -60,8 +67,12 @@ func (h Handler) GoogleLogin(c *gin.Context) {
 		return
 	}
 
-	logger.INFO.Printf("[GoogleLogin] redirecting to google oauth")
-	c.Redirect(http.StatusFound, authURL)
+	logger.INFO.Printf("[GoogleLogin] returning google oauth url")
+	c.JSON(http.StatusOK, response.NewResponse(
+		constants.LoginSuccess.Code,
+		constants.LoginSuccess.Message,
+		GoogleLoginResponse{URL: authURL},
+	))
 }
 
 // GoogleCallback completes the Google OAuth flow and returns the local session token.
@@ -133,20 +144,9 @@ func (h Handler) GoogleCallback(c *gin.Context) {
 	}
 
 	logger.INFO.Printf("[GoogleCallback] user authenticated successfully: %s", user.Email)
-	c.JSON(http.StatusOK, response.NewResponse(
-		constants.LoginSuccess.Code,
-		constants.LoginSuccess.Message,
-		LoginResponse{
-			User: LoginUserResponse{
-				ID:       user.ID,
-				Name:     user.Name,
-				Username: user.Username,
-				Email:    user.Email,
-				Image:    user.Image,
-			},
-			SessionToken: token,
-		},
-	))
+	
+	redirectURL := fmt.Sprintf("%s/auth/callback?token=%s", config.GetConfig().FrontendURL, token)
+	c.Redirect(http.StatusFound, redirectURL)
 }
 
 func randomState() (string, error) {
