@@ -133,3 +133,25 @@ export async function setAuthTokenAction(token: string) {
   });
   return { success: true };
 }
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (token) {
+    try {
+      // Optional: notify backend about logout
+      await fetch(`${API_URL}/api/v1/logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Logout Backend Error:", error);
+    }
+  }
+
+  cookieStore.delete("auth_token");
+  return { success: true };
+}
