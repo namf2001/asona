@@ -145,7 +145,7 @@ func (h Handler) GoogleCallback(c *gin.Context) {
 
 	logger.INFO.Printf("[GoogleCallback] user authenticated successfully: %s", user.Email)
 	
-	redirectURL := fmt.Sprintf("%s/auth/callback?token=%s", config.GetConfig().FrontendURL, token)
+	redirectURL := fmt.Sprintf("%s/api/auth/callback?token=%s", config.GetConfig().FrontendURL, token)
 	c.Redirect(http.StatusFound, redirectURL)
 }
 

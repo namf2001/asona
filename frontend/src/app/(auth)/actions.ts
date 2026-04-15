@@ -2,6 +2,8 @@
 
 import { cookies } from "next/headers";
 import { z } from "zod";
+
+import { getAuthCookieOptions } from "@/lib/auth";
 import { loginSchema, passwordSchema } from "./schema";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -23,12 +25,7 @@ export async function loginAction(data: z.infer<typeof loginSchema>) {
     const { session_token } = body.data || {};
     if (session_token) {
       const cookieStore = await cookies();
-      cookieStore.set("auth_token", session_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
+      cookieStore.set("auth_token", session_token, getAuthCookieOptions());
     }
 
     return { success: true };
@@ -108,12 +105,7 @@ export async function registerStep3Action(input: {
     const { session_token } = body.data || {};
     if (session_token) {
       const cookieStore = await cookies();
-      cookieStore.set("auth_token", session_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
+      cookieStore.set("auth_token", session_token, getAuthCookieOptions());
     }
 
     return { success: true };
@@ -125,12 +117,7 @@ export async function registerStep3Action(input: {
 
 export async function setAuthTokenAction(token: string) {
   const cookieStore = await cookies();
-  cookieStore.set("auth_token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-  });
+  cookieStore.set("auth_token", token, getAuthCookieOptions());
   return { success: true };
 }
 

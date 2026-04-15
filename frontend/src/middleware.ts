@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicRoutes = ['/login', '/register', '/verify', '/create-password', '/auth/callback', '/forgot-password', '/reset-password'];
+const publicRoutes = ['/login', '/register', '/verify', '/create-password', '/forgot-password', '/reset-password'];
 
 export function middleware(request: NextRequest) {
   const { nextUrl, cookies } = request;

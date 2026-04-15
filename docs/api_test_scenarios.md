@@ -243,7 +243,7 @@
 
 ## 📝 Ghi chú
 
-1. **RSA Middleware**: Khi `APP_ENV != local`, request body phải được encrypt bằng RSA. Các test case ở trên giả định `APP_ENV=local` (skip RSA).
+1. **RSA Middleware**: Khi `APP_ENV != dev`, request body phải được encrypt bằng RSA. Các test case ở trên giả định `APP_ENV=dev` (skip RSA).
 2. **Seed Data**: Chạy `make seed` trước khi test để có data phù hợp.
 3. **Token**: Sử dụng session token từ Login response cho các API authenticated.
 4. **WebSocket**: Không bao gồm ở đây vì cần test riêng (không phải REST API).

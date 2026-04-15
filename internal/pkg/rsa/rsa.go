@@ -1,19 +1,19 @@
 package rsa
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
-	"asona/config"
-	// "location-tracker-backend/logger"
-	"crypto/aes"
-	"crypto/cipher"
-	"encoding/hex"
 	"io"
+
+	"asona/config"
 )
 
 var GlobalRSAKeyPair *KeyPair
@@ -63,7 +63,7 @@ func (r *KeyPair) GenerateRSAKeyPair(bits int) error {
 }
 
 func (r *KeyPair) Decrypt(encryptedData []byte) ([]byte, error) {
-	if r.config.AppEnv == "local" {
+	if r.config.AppEnv == "dev" {
 		return encryptedData, nil
 	}
 
@@ -77,7 +77,7 @@ func (r *KeyPair) Decrypt(encryptedData []byte) ([]byte, error) {
 }
 
 func (r *KeyPair) Encrypt(data []byte) ([]byte, error) {
-	if r.config.AppEnv == "local" {
+	if r.config.AppEnv == "dev" {
 		return data, nil
 	}
 
@@ -91,7 +91,7 @@ func (r *KeyPair) Encrypt(data []byte) ([]byte, error) {
 }
 
 func (r *KeyPair) EncryptToString(data []byte) (string, error) {
-	if r.config.AppEnv == "local" {
+	if r.config.AppEnv == "dev" {
 		return string(data), nil
 	}
 

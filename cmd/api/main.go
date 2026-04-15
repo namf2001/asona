@@ -60,15 +60,15 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 // @name Authorization
 func main() {
 	// Parse command line flags; allow APP_ENV fallback
-	envFlag := flag.String("e", "", "Environment to run (development, staging, production)")
+	envFlag := flag.String("e", "", "Environment to run (dev, production)")
 	flag.Parse()
 
 	env := *envFlag
 	if env == "" {
 		env = os.Getenv("APP_ENV")
-		if env == "" {
+	}
+	if env == "" || env == "local" {
 			env = "dev"
-		}
 	}
 
 	log.Printf("Initializing config for environment: %s", env)

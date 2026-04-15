@@ -24,8 +24,8 @@ func RSAAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cfg := config.GetConfig()
 
-		// Skip decryption in local environment
-		if cfg.AppEnv == "local" {
+		// Skip decryption in dev environment
+		if cfg.AppEnv == "dev" {
 			c.Next()
 			return
 		}

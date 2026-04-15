@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -15,7 +16,7 @@ import (
 type EnvConfig struct {
 	// App
 	AppPort string `envconfig:"PORT"    default:"8080"`
-	AppEnv  string `envconfig:"APP_ENV" default:"local"`
+	AppEnv  string `envconfig:"APP_ENV" default:"dev"`
 	FrontendURL string `envconfig:"FRONTEND_URL" default:"http://localhost:3000"`
 
 	// DB
@@ -55,7 +56,7 @@ type EnvConfig struct {
 
 	// JWT
 	JWTSecret         string        `envconfig:"JWT_SECRET"          default:"super-secret-key-12345"`
-	JWTAccessDuration time.Duration `envconfig:"JWT_ACCESS_DURATION" default:"1h"`
+	JWTAccessDuration time.Duration `envconfig:"JWT_ACCESS_DURATION" default:"24h"`
 
 	// RSA Keys
 	RSAPrivateKeyPath string `envconfig:"RSA_PRIVATE_KEY_PATH" default:"config/key-pem/private_key.pem"`
@@ -86,6 +87,9 @@ func findProjectRoot() string {
 
 // Init initializes config
 func Init(env string) {
+	if strings.TrimSpace(env) == "" {
+		env = "dev"
+	}
 
 	root := findProjectRoot()
 

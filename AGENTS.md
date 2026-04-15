@@ -20,7 +20,7 @@
 ## Security + Request Processing Patterns
 - Authenticated routes expect `Authorization: Bearer <jwt>` parsed by `internal/handler/middleware/auth.go`; user info is stored in Gin context as `userID`, `email`.
 - Request decryption middleware (`internal/handler/middleware/decode_rsa.go`) is **environment-dependent**:
-  - `APP_ENV=local`: RSA decryption is skipped.
+  - `APP_ENV=dev`: RSA decryption is skipped.
   - non-local: request body must be JSON with `data` bytes decryptable by `GlobalRSAKeyPair`.
 - RSA keys are loaded/generated at startup in `cmd/api/server/rsa.go` using paths from `config/config.go` (`config/key-pem/*` by default).
 
