@@ -21,6 +21,7 @@ import (
 	"asona/internal/handler/rest/v1/organizations"
 	"asona/internal/handler/rest/v1/projects"
 	"asona/internal/handler/rest/v1/tasks"
+	"asona/internal/handler/rest/v1/workplaces"
 	"asona/internal/handler/rest/v1/websocket"
 	"asona/internal/service/database"
 	"asona/internal/service/redis"
@@ -40,6 +41,7 @@ type router struct {
 	chatHandler chat.Handler
 	projHandler projects.Handler
 	taskHandler tasks.Handler
+	wpHandler   workplaces.Handler
 	wsHandler   *websocket.Handler
 }
 
@@ -106,6 +108,12 @@ func (rtr router) authenticated(r *gin.Engine) {
 	{
 		orgs.POST("", rtr.orgHandler.CreateOrganization)
 		orgs.GET("/:id", rtr.orgHandler.GetOrganization)
+	}
+
+	// Workplaces
+	wps := v1.Group("/workplaces")
+	{
+		wps.POST("", rtr.wpHandler.CreateWorkplace)
 	}
 
 	// Channels

@@ -101,6 +101,22 @@ func TestRSAAuthMiddleware(t *testing.T) {
 		require.Contains(t, rec.Body.String(), constants.InvalidRequestParams.Code)
 	})
 
+	t.Run("non-dev rejects json body without encrypted data", func(t *testing.T) {
+		setupConfig(t, "staging")
+		originalKeyPair := rsa.GlobalRSAKeyPair
+		rsa.GlobalRSAKeyPair = nil
+		t.Cleanup(func() { rsa.GlobalRSAKeyPair = originalKeyPair })
+
+		router := makeTestRouter()
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{}`))
+		rec := httptest.NewRecorder()
+
+		router.ServeHTTP(rec, req)
+
+		require.Equal(t, http.StatusBadRequest, rec.Code)
+		require.Contains(t, rec.Body.String(), constants.InvalidRequestParams.Code)
+	})
+
 	t.Run("non-dev returns 500 when rsa keypair missing", func(t *testing.T) {
 		setupConfig(t, "staging")
 		originalKeyPair := rsa.GlobalRSAKeyPair

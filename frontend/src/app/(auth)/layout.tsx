@@ -21,8 +21,6 @@ export default function AuthLayout({
           sizes="100vw"
           placeholder="blur"
         />
-        {/* Subtle overlay to soften the image and improve form readability if needed */}
-        <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px]"></div>
       </div>
 
       {/* Main Container */}

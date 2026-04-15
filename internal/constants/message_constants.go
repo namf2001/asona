@@ -43,6 +43,10 @@ var (
 	OrganizationNotFound   = ResponseCode{"ERR024", "Organization not found"}
 	CreateOrganizationFail = ResponseCode{"ERR023", "Create organization fail"}
 
+	// Workplace errors
+	WorkplaceNotFound   = ResponseCode{"ERR025", "Workplace not found"}
+	CreateWorkplaceFail = ResponseCode{"ERR026", "Create workplace fail"}
+
 	// RSA errors
 	EncryptRSAFail    = ResponseCode{"ERR099", "Encrypt data fail"}
 	DecryptRSAFail    = ResponseCode{"ERR099", "Decrypt data fail"}

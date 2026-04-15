@@ -21,11 +21,13 @@ const (
 type WorkplaceSize string
 
 const (
-	WorkplaceSizeXS WorkplaceSize = "1-10"
-	WorkplaceSizeS  WorkplaceSize = "11-50"
-	WorkplaceSizeM  WorkplaceSize = "51-200"
-	WorkplaceSizeL  WorkplaceSize = "201-500"
-	WorkplaceSizeXL WorkplaceSize = "500+"
+	WorkplaceSize2_5    WorkplaceSize = "2-5"
+	WorkplaceSize6_10   WorkplaceSize = "6-10"
+	WorkplaceSize11_20  WorkplaceSize = "11-20"
+	WorkplaceSize21_50  WorkplaceSize = "21-50"
+	WorkplaceSize51_100 WorkplaceSize = "51-100"
+	WorkplaceSize101_250 WorkplaceSize = "101-250"
+	WorkplaceSize250Plus WorkplaceSize = "250-more"
 )
 
 // OrgRole represents roles within an organization

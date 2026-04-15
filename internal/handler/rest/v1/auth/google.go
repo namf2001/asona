@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -80,7 +80,7 @@ func (h Handler) GoogleLogin(c *gin.Context) {
 // @Description  Handle the Google OAuth callback and create a local session
 // @Tags         auth
 // @Produce      json
-// @Success      200  {object} response.Response{data=LoginResponse}
+// @Success      302
 // @Failure      400  {object} response.Response
 // @Failure      401  {object} response.Response
 // @Failure      500  {object} response.Response
@@ -149,8 +149,25 @@ func (h Handler) GoogleCallback(c *gin.Context) {
 	if user.OnboardedAt != nil {
 		isOnboarded = "true"
 	}
-	redirectURL := fmt.Sprintf("%s/api/auth/callback?token=%s&is_onboarded=%s", config.GetConfig().FrontendURL, token, isOnboarded)
-	c.Redirect(http.StatusFound, redirectURL)
+
+	frontendURL, err := url.Parse(config.GetConfig().FrontendURL)
+	if err != nil {
+		logger.ERROR.Printf("[GoogleCallback] invalid frontend url config: %+v", err)
+		c.JSON(http.StatusInternalServerError, response.NewResponse(
+			constants.InternalServerError.Code,
+			constants.InternalServerError.Message,
+			nil,
+		))
+		return
+	}
+
+	callbackURL := frontendURL.ResolveReference(&url.URL{Path: "/api/auth/callback"})
+	query := callbackURL.Query()
+	query.Set("token", token)
+	query.Set("is_onboarded", isOnboarded)
+	callbackURL.RawQuery = query.Encode()
+
+	c.Redirect(http.StatusFound, callbackURL.String())
 }
 
 func randomState() (string, error) {

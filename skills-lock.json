@@ -16,6 +16,11 @@
       "sourceType": "github",
       "computedHash": "d2f0a7065f7418fdb3ae88559f1f1426f40c26f2b5aebcd394797418d4bb3b04"
     },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "873c67922d80775a9fdf596db7964b579f0408c30ec6e3d11989f6055bbec89f"
+    },
     "tanstack-start-best-practices": {
       "source": "deckardger/tanstack-agent-skills",
       "sourceType": "github",
