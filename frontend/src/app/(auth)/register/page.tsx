@@ -56,7 +56,22 @@ export default function RegisterPage() {
           variant="outline" 
           className="w-full h-12 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-medium shadow-sm transition-all" 
           type="button"
-          onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/auth/google`}
+          onClick={async () => {
+            try {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/auth/google`, {
+                credentials: 'include'
+              });
+              const body = await response.json();
+              if (body.data?.url) {
+                window.location.href = body.data.url;
+              } else {
+                toast.error("Failed to get Google login URL");
+              }
+            } catch (err) {
+              console.error("Google register error:", err);
+              toast.error("Network error during Google login");
+            }
+          }}
         >
           <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

@@ -1,9 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
 
-import { AsonaLogo, AsonaLoginGroupItems, AsonaBg } from '@/../public/images';
+import { AsonaLogo, AsonaBg } from '@/../public/images';
 
-export default function AuthLayout({
+export default function OnBoardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -57,18 +57,7 @@ export default function AuthLayout({
             </h2>
           </div>
 
-          <div className="flex-1 w-full relative min-h-[400px] hidden lg:flex items-center justify-center">
-            {/* The Login Group Items Illustration */}
-            <div className="relative w-full h-full max-w-[800px] max-h-[600px] flex items-center justify-center">
-              <Image 
-                src={AsonaLoginGroupItems} 
-                alt="Asona Illustration" 
-                fill 
-                className="object-contain drop-shadow-2xl" 
-                priority 
-              />
-            </div>
-          </div>
+          <div className="flex-1 w-full relative min-h-[400px] hidden lg:flex items-center justify-center"/>
         </div>
 
         {/* Right Side: Form Container */}

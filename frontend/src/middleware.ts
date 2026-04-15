@@ -22,6 +22,22 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
+  // 3. Onboarding logic
+  if (token) {
+    const isOnboarded = cookies.get('onboarded')?.value === 'true';
+    const isOnboardRoute = nextUrl.pathname.startsWith('/onboard');
+
+    // If not onboarded and not on an onboard route -> redirect to onboard
+    if (!isOnboarded && !isOnboardRoute && !isStaticResource) {
+      return NextResponse.redirect(new URL('/onboard', request.url));
+    }
+
+    // If already onboarded and trying to access onboard routes -> redirect to home
+    if (isOnboarded && isOnboardRoute) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 

@@ -39,7 +39,11 @@ export default function LoginPage() {
         toast.error(result.error);
       } else {
         toast.success("Login successful");
-        router.push("/");
+        if (result.isOnboarded) {
+          router.push("/");
+        } else {
+          router.push("/onboard");
+        }
       }
     });
   }

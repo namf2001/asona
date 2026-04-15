@@ -7,12 +7,13 @@ type ResponseCode struct {
 
 var (
 	// Success
-	Success             = ResponseCode{"00", "Success"}
-	LoginSuccess        = ResponseCode{"INF003", "Login success"}
-	RegisterUserSuccess           = ResponseCode{"INF001", "Register user success"}
-	LogoutSuccess                 = ResponseCode{"INF004", "Logout success"}
-	SendEmailRegisterSuccess      = ResponseCode{"INF009", "Send email register success"}
-	EmailVerifiedSuccess          = ResponseCode{"INF061", "Email verified successfully"}
+	Success                  = ResponseCode{"00", "Success"}
+	LoginSuccess             = ResponseCode{"INF003", "Login success"}
+	RegisterUserSuccess      = ResponseCode{"INF001", "Register user success"}
+	LogoutSuccess            = ResponseCode{"INF004", "Logout success"}
+	SendEmailRegisterSuccess = ResponseCode{"INF009", "Send email register success"}
+	EmailVerifiedSuccess     = ResponseCode{"INF061", "Email verified successfully"}
+	OnboardSuccess           = ResponseCode{"INF010", "Onboarding completed successfully"}
 
 	// General Errors
 	InternalServerError  = ResponseCode{"ERR500", "Internal server error"}
@@ -39,7 +40,7 @@ var (
 	SendMessageWSFail = ResponseCode{"ERR050", "Send message to websocket fail"}
 
 	// Organization errors
-	OrganizationNotFound = ResponseCode{"ERR024", "Organization not found"}
+	OrganizationNotFound   = ResponseCode{"ERR024", "Organization not found"}
 	CreateOrganizationFail = ResponseCode{"ERR023", "Create organization fail"}
 
 	// RSA errors

@@ -1,8 +1,9 @@
 package model
 
 import (
-	"asona/internal/model/common"
 	"time"
+
+	"asona/internal/model/common"
 )
 
 // User represents a user in the system
@@ -16,6 +17,7 @@ type User struct {
 	Image         string     `json:"image,omitempty"           db:"avatar_url"`
 	Password      string     `json:"-"                         db:"password"`
 	IsActive      bool       `json:"is_active,omitempty"       db:"is_active"`
+	OnboardedAt   *time.Time `json:"onboarded_at,omitempty"    db:"onboarded_at"`
 	CreatedAt     time.Time  `json:"created_at,omitempty"      db:"created_at"`
 	UpdatedAt     time.Time  `json:"updated_at,omitempty"      db:"updated_at"`
 }

@@ -13,11 +13,12 @@ import (
 )
 
 type GetProfileResponse struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Image    string `json:"image,omitempty"`
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Image       string `json:"image,omitempty"`
+	IsOnboarded bool   `json:"is_onboarded"`
 }
 
 // Profile handles GET /auth/profile
@@ -73,11 +74,12 @@ func (h Handler) Profile(c *gin.Context) {
 	}
 
 	res := GetProfileResponse{
-		ID:       user.ID,
-		Name:     user.Name,
-		Username: user.Username,
-		Email:    user.Email,
-		Image:    user.Image,
+		ID:          user.ID,
+		Name:        user.Name,
+		Username:    user.Username,
+		Email:       user.Email,
+		Image:       user.Image,
+		IsOnboarded: user.OnboardedAt != nil,
 	}
 
 	logger.INFO.Printf("[Profile] user profile retrieved successfully: %s", user.Email)

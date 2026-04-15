@@ -26,6 +26,10 @@ type Repository interface {
 
 	// Delete deletes a user by ID
 	Delete(ctx context.Context, id int64) error
+
+	// CompleteOnboard marks the user as having completed the onboarding flow
+	// by setting onboarded_at to the current timestamp.
+	CompleteOnboard(ctx context.Context, userID int64) error
 }
 
 type impl struct {

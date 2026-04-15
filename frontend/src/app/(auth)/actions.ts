@@ -3,10 +3,32 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-import { getAuthCookieOptions } from "@/lib/auth";
+import { getAuthCookieOptions, getTokenMaxAge } from "@/lib/auth";
 import { loginSchema, passwordSchema } from "./schema";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// setOnboardedCookie sets the `onboarded` cookie for the current session.
+function onboardedCookieOptions() {
+  return {
+    httpOnly: false, // readable by Next.js middleware
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: getTokenMaxAge(),
+  };
+}
+
+function setOnboardedCookie(
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
+  isOnboarded: boolean
+) {
+  cookieStore.set(
+    "onboarded",
+    isOnboarded ? "true" : "false",
+    onboardedCookieOptions()
+  );
+}
 
 export async function loginAction(data: z.infer<typeof loginSchema>) {
   try {
@@ -22,13 +44,14 @@ export async function loginAction(data: z.infer<typeof loginSchema>) {
       return { error: body.message || "Login failed" };
     }
 
-    const { session_token } = body.data || {};
+    const { session_token, user } = body.data || {};
     if (session_token) {
       const cookieStore = await cookies();
       cookieStore.set("auth_token", session_token, getAuthCookieOptions());
+      setOnboardedCookie(cookieStore, !!user?.is_onboarded);
     }
 
-    return { success: true };
+    return { success: true, isOnboarded: !!(user?.is_onboarded) };
   } catch (error: unknown) {
     console.error("Login Action Error:", error);
     return { error: "Network or server connection error" };
@@ -106,18 +129,23 @@ export async function registerStep3Action(input: {
     if (session_token) {
       const cookieStore = await cookies();
       cookieStore.set("auth_token", session_token, getAuthCookieOptions());
+      // New users from register are never onboarded yet
+      setOnboardedCookie(cookieStore, false);
     }
 
-    return { success: true };
+    return { success: true, isOnboarded: false };
   } catch (error) {
     console.error("Register Step 3 Error:", error);
     return { error: "Network or server connection error" };
   }
 }
 
-export async function setAuthTokenAction(token: string) {
+export async function setAuthTokenAction(token: string, isOnboarded?: boolean) {
   const cookieStore = await cookies();
   cookieStore.set("auth_token", token, getAuthCookieOptions());
+  if (typeof isOnboarded === "boolean") {
+    setOnboardedCookie(cookieStore, isOnboarded);
+  }
   return { success: true };
 }
 
@@ -140,5 +168,38 @@ export async function logoutAction() {
   }
 
   cookieStore.delete("auth_token");
+  cookieStore.delete("onboarded");
   return { success: true };
+}
+
+export async function completeOnboardAction() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) {
+    return { error: "Not authenticated" };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/v1/me/onboard`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const body = await res.json();
+    if (!res.ok) {
+      return { error: body.message || "Failed to complete onboarding" };
+    }
+
+    const isOnboarded = body?.data?.is_onboarded === true;
+    setOnboardedCookie(cookieStore, isOnboarded);
+
+    return { success: true, isOnboarded };
+  } catch (error) {
+    console.error("Complete Onboard Error:", error);
+    return { error: "Network or server connection error" };
+  }
 }

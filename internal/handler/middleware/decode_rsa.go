@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
@@ -30,9 +31,36 @@ func RSAAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		rawBody, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			logger.ERROR.Printf("[RSAAuthMiddleware] failed to read request body: %+v", err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, response.NewResponse(
+				constants.InvalidRequestParams.Code,
+				constants.InvalidRequestParams.Message,
+				nil,
+			))
+			return
+		}
+
+		if strings.TrimSpace(string(rawBody)) == "" {
+			c.Request.Body = io.NopCloser(strings.NewReader(""))
+			c.Next()
+			return
+		}
+
 		var body BodyEncrypt
-		if err := c.ShouldBindJSON(&body); err != nil {
+		if err := json.Unmarshal(rawBody, &body); err != nil {
 			logger.ERROR.Printf("[RSAAuthMiddleware] invalid request body: %+v", err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, response.NewResponse(
+				constants.InvalidRequestParams.Code,
+				constants.InvalidRequestParams.Message,
+				nil,
+			))
+			return
+		}
+
+		if len(body.Data) == 0 {
+			logger.ERROR.Printf("[RSAAuthMiddleware] encrypted body data is empty")
 			c.AbortWithStatusJSON(http.StatusBadRequest, response.NewResponse(
 				constants.InvalidRequestParams.Code,
 				constants.InvalidRequestParams.Message,

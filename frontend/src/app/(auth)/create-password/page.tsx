@@ -62,13 +62,12 @@ function CreatePasswordContent() {
         toast.error(result.error);
       } else {
         toast.success("Đăng ký thành công!");
-        router.push("/");
+        router.push("/onboard");
       }
     });
   }
 
   return (
-    <div className="flex flex-col w-full h-full font-inter">
     <div className="flex flex-col w-full h-full font-inter">
       <div className="mb-8">
         <h1 className="text-[32px] font-semibold text-slate-900 tracking-tight">Create Password</h1>
@@ -159,7 +158,6 @@ function CreatePasswordContent() {
           </Button>
         </form>
       </Form>
-    </div>
     </div>
   );
 }

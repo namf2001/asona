@@ -19,6 +19,8 @@ type Controller interface {
 	Logout(ctx context.Context, token string) error
 	GoogleAuthURL(ctx context.Context, state string) (string, error)
 	GoogleCallback(ctx context.Context, code string) (model.User, string, error)
+	// CompleteOnboard marks the given user as having finished the onboarding flow.
+	CompleteOnboard(ctx context.Context, userID int64) error
 }
 
 type impl struct {

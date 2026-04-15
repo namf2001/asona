@@ -24,12 +24,12 @@ type GoogleLoginResponse struct {
 	URL string `json:"url"`
 }
 
-// GoogleLogin starts the Google OAuth flow by redirecting the user to Google.
+// GoogleLogin starts the Google OAuth flow and returns the Google authorization URL.
 // @Summary      Google OAuth Login
 // @Description  Redirect the user to Google OAuth consent screen
 // @Tags         auth
 // @Produce      json
-// @Success      302
+// @Success      200  {object} response.Response{data=GoogleLoginResponse}
 // @Failure      500  {object} response.Response
 // @Router       /auth/google [get]
 func (h Handler) GoogleLogin(c *gin.Context) {
@@ -144,8 +144,12 @@ func (h Handler) GoogleCallback(c *gin.Context) {
 	}
 
 	logger.INFO.Printf("[GoogleCallback] user authenticated successfully: %s", user.Email)
-	
-	redirectURL := fmt.Sprintf("%s/api/auth/callback?token=%s", config.GetConfig().FrontendURL, token)
+
+	isOnboarded := "false"
+	if user.OnboardedAt != nil {
+		isOnboarded = "true"
+	}
+	redirectURL := fmt.Sprintf("%s/api/auth/callback?token=%s&is_onboarded=%s", config.GetConfig().FrontendURL, token, isOnboarded)
 	c.Redirect(http.StatusFound, redirectURL)
 }
 

@@ -19,11 +19,12 @@ type LoginRequest struct {
 }
 
 type LoginUserResponse struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Image    string `json:"image,omitempty"`
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Image       string `json:"image,omitempty"`
+	IsOnboarded bool   `json:"is_onboarded"`
 }
 
 type LoginResponse struct {
@@ -91,11 +92,12 @@ func (h Handler) Login(c *gin.Context) {
 		constants.LoginSuccess.Message,
 		LoginResponse{
 			User: LoginUserResponse{
-				ID:       user.ID,
-				Name:     user.Name,
-				Username: user.Username,
-				Email:    user.Email,
-				Image:    user.Image,
+				ID:          user.ID,
+				Name:        user.Name,
+				Username:    user.Username,
+				Email:       user.Email,
+				Image:       user.Image,
+				IsOnboarded: user.OnboardedAt != nil,
 			},
 			SessionToken: token,
 		},

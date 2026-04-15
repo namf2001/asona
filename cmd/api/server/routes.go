@@ -99,6 +99,7 @@ func (rtr router) authenticated(r *gin.Engine) {
 
 	v1.GET("/profile", rtr.authHandler.Profile)
 	v1.POST("/logout", rtr.authHandler.Logout)
+	v1.PATCH("/me/onboard", rtr.authHandler.CompleteOnboard)
 
 	// Organizations
 	orgs := v1.Group("/organizations")
