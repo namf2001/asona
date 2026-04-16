@@ -9,7 +9,7 @@ services:
       target: prod
     restart: unless-stopped
     env_file:
-      - ../.env                            # load từ project root
+      - ../.env                       # load từ asona/.env (tương đối)
     environment:
       APP_ENV: ${APP_ENV}
       PORT: ${PORT}
