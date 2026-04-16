@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	defaultSeed    = 42
+	defaultSeed     = 42
 	defaultPassword = "password123"
 )
 
@@ -153,19 +153,30 @@ func seedUsers(ctx context.Context, tx *sql.Tx, fake *gofakeit.Faker, hashedPass
 	log.Println("👤 Seeding users...")
 	users := []struct {
 		name, username, displayName, email, avatarURL string
+		onboardingStatus                              string
+		onboardingStep                                int
+		completed                                     bool
 	}{
-		{"Nguyen Van A", "nguyenvana", "Van A", "user1@example.com", "https://i.pravatar.cc/200?u=1"},
-		{"Tran Thi B", "tranthib", "Thi B", "user2@example.com", "https://i.pravatar.cc/200?u=2"},
-		{"Le Van C", "levanc", "Van C", "user3@example.com", "https://i.pravatar.cc/200?u=3"},
-		{"Pham Thi D", "phamthid", "Thi D", "user4@example.com", "https://i.pravatar.cc/200?u=4"},
-		{"Hoang Van E", "hoangvane", "Van E", "user5@example.com", "https://i.pravatar.cc/200?u=5"},
+		{"Nguyen Van A", "nguyenvana", "Van A", "user1@example.com", "https://i.pravatar.cc/200?u=1", "completed", 3, true},
+		{"Tran Thi B", "tranthib", "Thi B", "user2@example.com", "https://i.pravatar.cc/200?u=2", "in_progress", 1, false},
+		{"Le Van C", "levanc", "Van C", "user3@example.com", "https://i.pravatar.cc/200?u=3", "pending", 0, false},
+		{"Pham Thi D", "phamthid", "Thi D", "user4@example.com", "https://i.pravatar.cc/200?u=4", "in_progress", 2, false},
+		{"Hoang Van E", "hoangvane", "Van E", "user5@example.com", "https://i.pravatar.cc/200?u=5", "completed", 3, true},
 	}
 
 	for _, u := range users {
+		var onboardedAt interface{}
+		if u.completed {
+			onboardedAt = time.Now().Add(-24 * time.Hour)
+		}
+
 		mustExec(ctx, tx, `
-			INSERT INTO users (name, username, display_name, email, email_verified, password, avatar_url, is_active)
-			VALUES ($1, $2, $3, $4, NOW(), $5, $6, true)`,
-			u.name, u.username, u.displayName, u.email, hashedPassword, u.avatarURL,
+			INSERT INTO users (
+				name, username, display_name, email, email_verified, password, avatar_url, is_active,
+				onboarding_status, onboarding_step, onboarded_at
+			)
+			VALUES ($1, $2, $3, $4, NOW(), $5, $6, true, $7, $8, $9)`,
+			u.name, u.username, u.displayName, u.email, hashedPassword, u.avatarURL, u.onboardingStatus, u.onboardingStep, onboardedAt,
 		)
 	}
 	log.Printf("   ✅ %d users seeded", len(users))
@@ -273,8 +284,8 @@ func seedWorkplaces(ctx context.Context, tx *sql.Tx, fake *gofakeit.Faker) {
 		size      string
 		createdBy int
 	}{
-		{"Engineering Team", "11-50", 1},
-		{"Marketing Team", "1-10", 2},
+		{"Engineering Team", "21-50", 1},
+		{"Marketing Team", "6-10", 2},
 	}
 
 	for _, w := range workplaces {
@@ -405,11 +416,11 @@ func seedProjectMembers(ctx context.Context, tx *sql.Tx) {
 func seedProjectStatuses(ctx context.Context, tx *sql.Tx) {
 	log.Println("📊 Seeding project statuses...")
 	statuses := []struct {
-		projectID  int
-		name       string
-		color      string
-		position   int
-		isDefault  bool
+		projectID int
+		name      string
+		color     string
+		position  int
+		isDefault bool
 	}{
 		// Project 1: Asona Platform
 		{1, "To Do", "#94A3B8", 0, true},
@@ -592,8 +603,8 @@ func seedTaskLinks(ctx context.Context, tx *sql.Tx) {
 		linkType  string
 		createdBy int
 	}{
-		{2, 3, "blocks", 1},       // Auth blocks DB schema
-		{4, 2, "relates_to", 2},   // API docs relates to Auth
+		{2, 3, "blocks", 1},     // Auth blocks DB schema
+		{4, 2, "relates_to", 2}, // API docs relates to Auth
 	}
 
 	for _, l := range links {

@@ -3,21 +3,10 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-import { getAuthCookieOptions, getTokenMaxAge } from "@/lib/auth";
+import { getAuthCookieOptions, getOnboardedCookieOptions } from "@/lib/auth";
 import { loginSchema, passwordSchema } from "./schema";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-// setOnboardedCookie sets the `onboarded` cookie for the current session.
-function onboardedCookieOptions() {
-  return {
-    httpOnly: false, // readable by Next.js middleware
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: getTokenMaxAge(),
-  };
-}
 
 function setOnboardedCookie(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
@@ -26,8 +15,77 @@ function setOnboardedCookie(
   cookieStore.set(
     "onboarded",
     isOnboarded ? "true" : "false",
-    onboardedCookieOptions()
+    getOnboardedCookieOptions()
   );
+}
+
+export async function getProfileAction() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) {
+    return { error: "Not authenticated" };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/v1/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const body = await res.json();
+    if (!res.ok) {
+      return { error: body.message || "Failed to get profile" };
+    }
+
+    const isOnboarded = body?.data?.is_onboarded === true;
+    setOnboardedCookie(cookieStore, isOnboarded);
+
+    return { success: true, isOnboarded };
+  } catch (error) {
+    console.error("Get Profile Action Error:", error);
+    return { error: "Network or server connection error" };
+  }
+}
+
+export async function getOnboardingStatusAction() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) {
+    return { error: "Not authenticated" };
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/api/v1/me/onboarding`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const body = await res.json();
+    if (!res.ok) {
+      return { error: body.message || "Failed to get onboarding status" };
+    }
+
+    const isOnboarded = body?.data?.is_onboarded === true;
+    setOnboardedCookie(cookieStore, isOnboarded);
+
+    return {
+      success: true,
+      isOnboarded,
+      status: body?.data?.status,
+      step: body?.data?.step,
+    };
+  } catch (error) {
+    console.error("Get Onboarding Status Error:", error);
+    return { error: "Network or server connection error" };
+  }
 }
 
 export async function loginAction(data: z.infer<typeof loginSchema>) {

@@ -21,8 +21,8 @@ import (
 	"asona/internal/handler/rest/v1/organizations"
 	"asona/internal/handler/rest/v1/projects"
 	"asona/internal/handler/rest/v1/tasks"
-	"asona/internal/handler/rest/v1/workplaces"
 	"asona/internal/handler/rest/v1/websocket"
+	"asona/internal/handler/rest/v1/workplaces"
 	"asona/internal/service/database"
 	"asona/internal/service/redis"
 
@@ -100,6 +100,7 @@ func (rtr router) authenticated(r *gin.Engine) {
 	v1.Use(middleware.RSAAuthMiddleware())
 
 	v1.GET("/profile", rtr.authHandler.Profile)
+	v1.GET("/me/onboarding", rtr.authHandler.GetOnboardingState)
 	v1.POST("/logout", rtr.authHandler.Logout)
 	v1.PATCH("/me/onboard", rtr.authHandler.CompleteOnboard)
 

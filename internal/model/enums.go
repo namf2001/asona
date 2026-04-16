@@ -21,11 +21,11 @@ const (
 type WorkplaceSize string
 
 const (
-	WorkplaceSize2_5    WorkplaceSize = "2-5"
-	WorkplaceSize6_10   WorkplaceSize = "6-10"
-	WorkplaceSize11_20  WorkplaceSize = "11-20"
-	WorkplaceSize21_50  WorkplaceSize = "21-50"
-	WorkplaceSize51_100 WorkplaceSize = "51-100"
+	WorkplaceSize2_5     WorkplaceSize = "2-5"
+	WorkplaceSize6_10    WorkplaceSize = "6-10"
+	WorkplaceSize11_20   WorkplaceSize = "11-20"
+	WorkplaceSize21_50   WorkplaceSize = "21-50"
+	WorkplaceSize51_100  WorkplaceSize = "51-100"
 	WorkplaceSize101_250 WorkplaceSize = "101-250"
 	WorkplaceSize250Plus WorkplaceSize = "250-more"
 )
@@ -102,4 +102,13 @@ const (
 	ChannelTypeDM      ChannelType = "dm"
 	ChannelTypeGroup   ChannelType = "group"
 	ChannelTypeProject ChannelType = "project"
+)
+
+// OnboardingStatus represents the onboarding flow state for a user.
+type OnboardingStatus string
+
+const (
+	OnboardingStatusPending    OnboardingStatus = "pending"
+	OnboardingStatusInProgress OnboardingStatus = "in_progress"
+	OnboardingStatusCompleted  OnboardingStatus = "completed"
 )

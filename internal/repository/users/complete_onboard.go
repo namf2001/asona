@@ -11,7 +11,14 @@ import (
 // CompleteOnboard sets the onboarded_at timestamp for the given user,
 // marking them as having completed the onboarding flow.
 func (i impl) CompleteOnboard(ctx context.Context, userID int64) error {
-	query := `UPDATE public.users SET onboarded_at = $1, updated_at = $2 WHERE id = $3`
+	query := `
+		UPDATE public.users
+		SET onboarded_at = $1,
+			onboarding_status = 'completed',
+			onboarding_step = 3,
+			updated_at = $2
+		WHERE id = $3
+	`
 	now := time.Now()
 	result, err := i.db.ExecContext(ctx, query, now, now, userID)
 	if err != nil {

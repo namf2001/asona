@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { StepWorkspaceName } from './_components/step-workspace-name';
 import { StepInviteMembers } from './_components/step-invite-members';
 
+import { completeOnboardAction } from '@/app/(auth)/actions';
+
 const TOTAL_STEPS = 2;
 
 export default function CreateWorkplacePage() {
@@ -77,19 +79,16 @@ export default function CreateWorkplacePage() {
   const handleFinish = () => {
     startTransition(async () => {
       try {
-        const response = await fetch('/api/v1/me/onboard', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to complete onboarding');
+        const result = await completeOnboardAction();
+        
+        if (result.error) {
+          throw new Error(result.error);
         }
 
         toast.success('Onboarding complete!');
         router.push('/');
-      } catch (error) {
-        toast.error('Failed to finalize onboarding');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to finalize onboarding');
         console.error(error);
       }
     });

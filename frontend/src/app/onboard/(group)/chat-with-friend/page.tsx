@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { completeOnboardAction } from '@/app/(auth)/actions';
+
 // MockFriend is a mock data type for a friend suggestion.
 interface MockFriend {
   id: string;
@@ -83,9 +85,20 @@ export default function ChatWithFriendPage() {
 
   function handleStartChat() {
     startTransition(async () => {
-      // TODO: call API to initiate chat
-      toast.success('Chat started successfully!');
-      router.push('/');
+      try {
+        // TODO: call API to initiate chat
+        const result = await completeOnboardAction();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        toast.success('Chat started successfully!');
+        router.push('/');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to start chat');
+        console.error(error);
+      }
     });
   }
 

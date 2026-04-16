@@ -40,8 +40,27 @@ const options: OnboardOption[] = [
   },
 ];
 
+import { getOnboardingStatusAction } from '@/app/(auth)/actions';
+
 export default function OnboardPage() {
   const router = useRouter();
+
+  React.useEffect(() => {
+    // Check onboard status from backend and sync `onboarded` cookie server-side.
+    const checkStatus = async () => {
+      try {
+        const result = await getOnboardingStatusAction();
+
+        if (result.success && result.isOnboarded) {
+          router.push('/');
+        }
+      } catch (err) {
+        console.error("Failed to check onboard status:", err);
+      }
+    };
+    
+    checkStatus();
+  }, [router]);
 
   return (
     <div className="min-h-screen relative flex items-center justify-center font-inter">

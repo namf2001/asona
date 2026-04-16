@@ -50,3 +50,18 @@ export function getAuthCookieOptions() {
     maxAge: getTokenMaxAge(),
   };
 }
+
+/**
+ * Standard cookie options for onboarding state.
+ * This cookie is readable in middleware to gate onboard routes.
+ */
+export function getOnboardedCookieOptions() {
+  return {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: getTokenMaxAge(),
+  };
+}
+

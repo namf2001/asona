@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { completeOnboardAction } from '@/app/(auth)/actions';
+
 // JoinOrganizationPage is the onboarding screen where users join an existing workspace via invite code.
 export default function JoinOrganizationPage() {
   const router = useRouter();
@@ -21,9 +23,21 @@ export default function JoinOrganizationPage() {
       return;
     }
     startTransition(async () => {
-      // TODO: call API to join organization
-      toast.success('Joined organization successfully!');
-      router.push('/');
+      try {
+        // TODO: call API to join organization (if needed)
+        // For now, we just complete the onboarding
+        const result = await completeOnboardAction();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        toast.success('Joined organization successfully!');
+        router.push('/');
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to join organization');
+        console.error(error);
+      }
     });
   }
 

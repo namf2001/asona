@@ -13,7 +13,7 @@ import (
 func (i impl) GetByEmail(ctx context.Context, email string) (model.User, error) {
 	var user model.User
 	query := `
-		SELECT id, name, username, display_name, email, password, avatar_url, is_active, onboarded_at, created_at, updated_at
+		SELECT id, name, username, display_name, email, password, avatar_url, is_active, onboarding_status, onboarding_step, onboarded_at, created_at, updated_at
 		FROM public.users
 		WHERE email = $1 AND is_active = true
 	`
@@ -26,6 +26,8 @@ func (i impl) GetByEmail(ctx context.Context, email string) (model.User, error) 
 		&user.Password,
 		&user.Image,
 		&user.IsActive,
+		&user.OnboardingStatus,
+		&user.OnboardingStep,
 		&user.OnboardedAt,
 		&user.CreatedAt,
 		&user.UpdatedAt,
