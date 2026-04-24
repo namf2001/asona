@@ -37,4 +37,5 @@ main
 .agents
 
 
-api
+# Swagger generated docs (auto-generated, do not commit)
+docs/swagger/

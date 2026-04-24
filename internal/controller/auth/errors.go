@@ -9,6 +9,9 @@ var (
 	// ErrInvalidPassword is returned when the password doesn't match.
 	ErrInvalidPassword = errors.New("authentication failed: invalid password")
 
+	// ErrInvalidToken is returned when the JWT token is malformed, expired, or has an invalid signature.
+	ErrInvalidToken = errors.New("authentication failed: invalid or expired token")
+
 	// ErrUserAlreadyExists is returned when an email/username is already taken.
 	ErrUserAlreadyExists = errors.New("registration failed: email already exists")
 

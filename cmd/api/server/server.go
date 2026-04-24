@@ -17,13 +17,6 @@ import (
 	"asona/internal/controller/projects"
 	"asona/internal/controller/tasks"
 	"asona/internal/controller/workplaces"
-	handlerauth "asona/internal/handler/rest/v1/auth"
-	handlerchat "asona/internal/handler/rest/v1/chat"
-	handlerorg "asona/internal/handler/rest/v1/organizations"
-	handlerproj "asona/internal/handler/rest/v1/projects"
-	handlertask "asona/internal/handler/rest/v1/tasks"
-	handlerwp "asona/internal/handler/rest/v1/workplaces"
-	handlerws "asona/internal/handler/rest/v1/websocket"
 	"asona/internal/repository"
 	"asona/internal/service/database"
 	"asona/internal/service/mail"
@@ -74,7 +67,9 @@ func NewServer() *http.Server {
 	logger, _ := zap.NewProduction()
 	defer func() { _ = logger.Sync() }()
 
-	// Initialize controllers
+	// Initialize controllers.
+	// Controllers are passed directly into the router; handlers are constructed
+	// inline inside each route-group function (following the Thor pattern).
 	authCtrl := auth.New(repo, s.oauth, s.mail)
 	orgCtrl := organizations.New(repo)
 	channelCtrl := ctrlChannel.New(repo)
@@ -83,27 +78,19 @@ func NewServer() *http.Server {
 	taskCtrl := tasks.New(repo)
 	wpCtrl := workplaces.New(repo)
 
-	// Initialize handlers
-	authHandler := handlerauth.New(authCtrl)
-	orgHandler := handlerorg.New(orgCtrl)
-	chatHandler := handlerchat.New(channelCtrl, messageCtrl)
-	projHandler := handlerproj.New(projCtrl)
-	taskHandler := handlertask.New(taskCtrl)
-	wpHandler := handlerwp.New(wpCtrl)
-	wsHandler := handlerws.New(s.ws)
-
 	rtr := router{
 		ctx:         s.ctx,
 		db:          s.db,
 		rdb:         s.rdb,
 		logger:      logger,
-		authHandler: authHandler,
-		orgHandler:  orgHandler,
-		chatHandler: chatHandler,
-		projHandler: projHandler,
-		taskHandler: taskHandler,
-		wpHandler:   wpHandler,
-		wsHandler:   wsHandler,
+		ws:          s.ws,
+		authCtrl:    authCtrl,
+		orgCtrl:     orgCtrl,
+		channelCtrl: channelCtrl,
+		messageCtrl: messageCtrl,
+		projCtrl:    projCtrl,
+		taskCtrl:    taskCtrl,
+		wpCtrl:      wpCtrl,
 	}
 
 	// Declare Server config
