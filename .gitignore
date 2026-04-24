@@ -39,3 +39,4 @@ main
 
 # Swagger generated docs (auto-generated, do not commit)
 docs/swagger/
+docs/issue/ 
