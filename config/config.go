@@ -55,7 +55,7 @@ type EnvConfig struct {
 	RedisPassword string `envconfig:"REDIS_PASSWORD" default:""`
 
 	// JWT
-	JWTSecret         string        `envconfig:"JWT_SECRET"          default:"super-secret-key-12345"`
+	JWTSecret         string        `envconfig:"JWT_SECRET"          required:"true"`
 	JWTAccessDuration time.Duration `envconfig:"JWT_ACCESS_DURATION" default:"24h"`
 
 	// RSA Keys
@@ -112,6 +112,11 @@ func Init(env string) {
 	var envCfg EnvConfig
 	if err := envconfig.Process("", &envCfg); err != nil {
 		log.Fatalf("[env] validation failed: %v", err)
+	}
+
+	// Enforce a minimum secret length to prevent use of weak JWT keys.
+	if len(strings.TrimSpace(envCfg.JWTSecret)) < 32 {
+		log.Fatalf("[env] JWT_SECRET must be at least 32 characters long (got %d)", len(strings.TrimSpace(envCfg.JWTSecret)))
 	}
 
 	c = &envCfg

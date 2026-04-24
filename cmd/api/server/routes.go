@@ -9,22 +9,30 @@ import (
 	_ "asona/docs/swagger"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
+	ginsessions "github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	authctrl "asona/internal/controller/auth"
+	ctrlChannel "asona/internal/controller/chat/channel"
+	ctrlMessage "asona/internal/controller/chat/message"
+	"asona/internal/controller/organizations"
+	"asona/internal/controller/projects"
+	"asona/internal/controller/tasks"
+	"asona/internal/controller/workplaces"
 	"asona/internal/handler/middleware"
-	"asona/internal/handler/rest/v1/auth"
-	"asona/internal/handler/rest/v1/chat"
-	"asona/internal/handler/rest/v1/organizations"
-	"asona/internal/handler/rest/v1/projects"
-	"asona/internal/handler/rest/v1/tasks"
-	"asona/internal/handler/rest/v1/websocket"
-	"asona/internal/handler/rest/v1/workplaces"
+	handlerauth "asona/internal/handler/rest/v1/auth"
+	handlerchat "asona/internal/handler/rest/v1/chat"
+	handlerorg "asona/internal/handler/rest/v1/organizations"
+	handlerproj "asona/internal/handler/rest/v1/projects"
+	handlertask "asona/internal/handler/rest/v1/tasks"
+	handlerws "asona/internal/handler/rest/v1/websocket"
+	handlerwp "asona/internal/handler/rest/v1/workplaces"
 	"asona/internal/service/database"
 	"asona/internal/service/redis"
+	wsservice "asona/internal/service/websocket"
 
 	"go.uber.org/zap"
 )
@@ -35,27 +43,25 @@ type router struct {
 	db     database.Service
 	rdb    redis.Service
 	logger *zap.Logger
+	ws     wsservice.Service
 
-	authHandler auth.Handler
-	orgHandler  organizations.Handler
-	chatHandler chat.Handler
-	projHandler projects.Handler
-	taskHandler tasks.Handler
-	wpHandler   workplaces.Handler
-	wsHandler   *websocket.Handler
+	authCtrl    authctrl.Controller
+	orgCtrl     organizations.Controller
+	channelCtrl ctrlChannel.Controller
+	messageCtrl ctrlMessage.Controller
+	projCtrl    projects.Controller
+	taskCtrl    tasks.Controller
+	wpCtrl      workplaces.Controller
 }
 
 // handler returns the http.Handler for use by the server.
 func (rtr router) handler() http.Handler {
 	r := gin.New()
 
-	// Middleware
 	r.Use(middleware.RequestID())
 	r.Use(middleware.Logger(rtr.logger))
 	r.Use(gin.Recovery())
-
-	r.Use(sessions.Sessions("session", cookie.NewStore([]byte(createRandStr()))))
-
+	r.Use(ginsessions.Sessions("session", cookie.NewStore([]byte(createRandStr()))))
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
@@ -83,77 +89,91 @@ func (rtr router) public(r *gin.Engine) {
 		c.JSON(http.StatusOK, rtr.db.Health())
 	})
 
-	// Swagger documentation
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// api/v1 public routes
+	authHandler := handlerauth.New(rtr.authCtrl, rtr.rdb)
+
 	v1 := r.Group("/api/v1")
-	v1.POST("/register", middleware.RSAAuthMiddleware(), rtr.authHandler.Register)
-	v1.POST("/login", middleware.RSAAuthMiddleware(), rtr.authHandler.Login)
-	v1.GET("/auth/google", rtr.authHandler.GoogleLogin)
-	v1.GET("/auth/google/callback", rtr.authHandler.GoogleCallback)
+	v1.POST("/register", middleware.RSAAuthMiddleware(), authHandler.Register)
+	v1.POST("/login", middleware.RSAAuthMiddleware(), authHandler.Login)
+	v1.GET("/auth/google", authHandler.GoogleLogin)
+	v1.GET("/auth/google/callback", authHandler.GoogleCallback)
+	// ExchangeOAuthCode exchanges a one-time Redis code for the real JWT session token.
+	// Token is never exposed in a URL — only returned via JSON body.
+	v1.POST("/auth/exchange", authHandler.ExchangeOAuthCode)
 }
 
 func (rtr router) authenticated(r *gin.Engine) {
+	authHandler := handlerauth.New(rtr.authCtrl, rtr.rdb)
+	orgHandler := handlerorg.New(rtr.orgCtrl)
+	chatHandler := handlerchat.New(rtr.channelCtrl, rtr.messageCtrl)
+	projHandler := handlerproj.New(rtr.projCtrl)
+	taskHandler := handlertask.New(rtr.taskCtrl)
+	wpHandler := handlerwp.New(rtr.wpCtrl)
+
 	v1 := r.Group("/api/v1")
-	v1.Use(middleware.TokenCheckMiddleware())
+	v1.Use(middleware.TokenCheckMiddleware(rtr.authCtrl))
 	v1.Use(middleware.RSAAuthMiddleware())
 
-	v1.GET("/profile", rtr.authHandler.Profile)
-	v1.GET("/me/onboarding", rtr.authHandler.GetOnboardingState)
-	v1.POST("/logout", rtr.authHandler.Logout)
-	v1.PATCH("/me/onboard", rtr.authHandler.CompleteOnboard)
+	// Auth
+	v1.GET("/profile", authHandler.Profile)
+	v1.GET("/me/onboarding", authHandler.GetOnboardingState)
+	v1.POST("/logout", authHandler.Logout)
+	v1.PATCH("/me/onboard", authHandler.CompleteOnboard)
 
 	// Organizations
 	orgs := v1.Group("/organizations")
 	{
-		orgs.POST("", rtr.orgHandler.CreateOrganization)
-		orgs.GET("/:id", rtr.orgHandler.GetOrganization)
+		orgs.POST("", orgHandler.CreateOrganization)
+		orgs.GET("/:id", orgHandler.GetOrganization)
 	}
 
 	// Workplaces
 	wps := v1.Group("/workplaces")
 	{
-		wps.POST("", rtr.wpHandler.CreateWorkplace)
+		wps.POST("", wpHandler.CreateWorkplace)
+		wps.GET("/:id/projects", projHandler.ListProjects)
 	}
 
 	// Channels
 	channels := v1.Group("/channels")
 	{
-		channels.POST("", rtr.chatHandler.CreateChannel)
-		channels.GET("/:id", rtr.chatHandler.GetChannel)
-		channels.GET("/:id/messages", rtr.chatHandler.ListMessages)
+		channels.POST("", chatHandler.CreateChannel)
+		channels.GET("/:id", chatHandler.GetChannel)
+		channels.GET("/:id/messages", chatHandler.ListMessages)
 	}
 
+	// Projects
 	projs := v1.Group("/projects")
 	{
-		projs.POST("", rtr.projHandler.CreateProject)
-		projs.GET("/:id", rtr.projHandler.GetProject)
-		projs.GET("/:id/tasks", rtr.taskHandler.ListTasks)
+		projs.POST("", projHandler.CreateProject)
+		projs.GET("/:id", projHandler.GetProject)
+		projs.GET("/:id/tasks", taskHandler.ListTasks)
 	}
-	v1.GET("/workplaces/:id/projects", rtr.projHandler.ListProjects)
 
 	// Tasks
 	taskGroup := v1.Group("/tasks")
 	{
-		taskGroup.POST("", rtr.taskHandler.CreateTask)
-		taskGroup.GET("/:id", rtr.taskHandler.GetTask)
-		taskGroup.PUT("/:id", rtr.taskHandler.UpdateTask)
+		taskGroup.POST("", taskHandler.CreateTask)
+		taskGroup.GET("/:id", taskHandler.GetTask)
+		taskGroup.PUT("/:id", taskHandler.UpdateTask)
 	}
 
 	// Messages
-	v1.POST("/messages", rtr.chatHandler.SendMessage)
+	v1.POST("/messages", chatHandler.SendMessage)
 }
 
 // websocketRoutes registers WebSocket routes.
 func (rtr router) websocketRoutes(r *gin.Engine) {
-	// WebSocket endpoint (public, requires userId query param)
-	r.GET("/ws", rtr.wsHandler.HandleWebSocket)
+	wsHandler := handlerws.New(rtr.ws)
 
-	// WebSocket endpoint with authentication
+	// Public WebSocket (userId via query param)
+	r.GET("/ws", wsHandler.HandleWebSocket)
+
+	// Authenticated WebSocket
 	wsAuth := r.Group("/api/v1/ws")
-	wsAuth.Use(middleware.TokenCheckMiddleware())
-	wsAuth.GET("", rtr.wsHandler.HandleWebSocket)
+	wsAuth.Use(middleware.TokenCheckMiddleware(rtr.authCtrl))
+	wsAuth.GET("", wsHandler.HandleWebSocket)
 }
 
 // createRandStr generates a random 32-byte hex string for use as a session secret.

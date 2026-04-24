@@ -228,14 +228,71 @@ Mọi mã lỗi (Code) và tin nhắn (Message) phải được định nghĩa t
 
 ---
 
-## 6. Wiring (Khởi tạo hệ thống)
+## 6. Wiring (Khởi tạo hệ thống) — Thor Pattern
 
-Thực hiện tại `cmd/api/server/server.go`:
+Thực hiện tại `cmd/api/server/server.go` và `cmd/api/server/routes.go`.
+
+### Nguyên tắc (Thor Pattern):
+- **`server.go`**: Khởi tạo services → repositories → **controllers**. Chỉ truyền controllers vào `router` struct. Không khởi tạo handler ở đây.
+- **`routes.go`**: `router` struct chứa **controllers** (và services stateful như `ws`, `rdb`). **Không** chứa handler fields.
+- **Handlers được khởi tạo inline** bên trong từng route-group function (`public`, `authenticated`, `websocketRoutes`).
+
+### Lý do (Why):
+- Handler là stateless transport layer — không cần giữ trong struct.
+- Controller chứa business logic dùng chung giữa nhiều route group → cần lưu trong struct.
+- Khởi tạo inline giúp thấy ngay handler nào thuộc route group nào, dễ trace dependency.
+
+### `server.go` — chỉ khởi tạo đến Controller:
+```go
+// Initialize controllers.
+// Handlers are constructed inline in routes.go (Thor pattern).
+authCtrl := auth.New(repo, s.oauth, s.mail)
+orgCtrl  := organizations.New(repo)
+// ...
+
+rtr := router{
+    authCtrl: authCtrl,
+    orgCtrl:  orgCtrl,
+    // ... controllers only, NO handlers
+}
+```
+
+### `routes.go` — router struct chứa Controllers:
+```go
+type router struct {
+    ctx     context.Context
+    db      database.Service
+    rdb     redis.Service
+    logger  *zap.Logger
+    ws      websocket.Service
+
+    authCtrl authctrl.Controller
+    orgCtrl  organizations.Controller
+    // ... other controllers
+}
+```
+
+### `routes.go` — Handlers khởi tạo inline trong route group:
+```go
+func (rtr router) authenticated(r *gin.Engine) {
+    // Handlers được khởi tạo inline tại đây — không lưu trong struct
+    authHandler := handlerauth.New(rtr.authCtrl, rtr.rdb)
+    orgHandler  := handlerorg.New(rtr.orgCtrl)
+
+    v1 := r.Group("/api/v1")
+    v1.Use(middleware.TokenCheckMiddleware(rtr.authCtrl))
+
+    v1.GET("/profile", authHandler.Profile)
+    // ...
+}
+```
+
+### Thứ tự khởi tạo trong `server.go`:
 1. Khởi tạo `database.Service`.
 2. Truyền `db.DB()` vào `repository.New`.
 3. Truyền `repo` vào các `Controller.New`.
-4. Truyền `controller` vào các `Handler.New`.
-5. Đăng ký route trong `router.go`---
+4. Truyền controllers vào `router` struct.
+5. Trong từng route-group function → khởi tạo handlers inline → đăng ký routes.
 
 ## 7. Error Handling (Domain-Specific Errors)
 

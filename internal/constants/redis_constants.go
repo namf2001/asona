@@ -25,4 +25,7 @@ const (
 
 	// TypingKeyPrefix is the prefix for typing indicator keys.
 	TypingKeyPrefix = "typing:"
+
+	// OAuthCodePrefix is the prefix for one-time Google OAuth authorization codes.
+	OAuthCodePrefix = "oauth:code:"
 )
