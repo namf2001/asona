@@ -12,7 +12,8 @@ import (
 	"asona/internal/pkg/logger"
 )
 
-type GetProfileResponse struct {
+// getProfileResponse is the JSON body returned for the GET /profile endpoint.
+type getProfileResponse struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	Username    string `json:"username"`
@@ -73,7 +74,7 @@ func (h Handler) Profile(c *gin.Context) {
 		return
 	}
 
-	res := GetProfileResponse{
+	res := getProfileResponse{
 		ID:          user.ID,
 		Name:        user.Name,
 		Username:    user.Username,

@@ -9,9 +9,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"asona/config"
 	"asona/internal/model"
-	"asona/internal/pkg/jwt"
 	"asona/internal/repository"
 	"asona/internal/repository/users"
 
@@ -103,6 +101,9 @@ func (i impl) RegisterStep3Complete(ctx context.Context, input RegisterInput) (m
 			if errors.Is(txErr, users.ErrEmailAlreadyExists) {
 				return pkgerrors.WithStack(ErrUserAlreadyExists)
 			}
+			if errors.Is(txErr, users.ErrUsernameAlreadyExists) {
+				return pkgerrors.WithStack(ErrUsernameAlreadyExists)
+			}
 			return pkgerrors.WithStack(fmt.Errorf("failed to register user: %w", txErr))
 		}
 
@@ -115,27 +116,14 @@ func (i impl) RegisterStep3Complete(ctx context.Context, input RegisterInput) (m
 			return pkgerrors.WithStack(fmt.Errorf("failed to insert credential account: %w", txErr))
 		}
 
-		sessionToken, txErr = jwt.GenerateToken(createdUser.ID, createdUser.Email)
-		if txErr != nil {
-			return pkgerrors.WithStack(fmt.Errorf("failed to generate token: %w", txErr))
-		}
-
-		accessDuration := config.GetConfig().JWTAccessDuration
-		if accessDuration == 0 {
-			accessDuration = time.Hour
-		}
-
-		_, txErr = txRepo.Session().Create(ctx, model.Session{
-			UserID:       createdUser.ID,
-			SessionToken: sessionToken,
-			ExpiresAt:    time.Now().Add(accessDuration),
-		})
-		if txErr != nil {
-			return txErr
-		}
-
 		return nil
 	}, nil)
+	if err != nil {
+		return model.User{}, "", err
+	}
+
+	// Issue session outside the transaction using the standard helper
+	sessionToken, err = i.issueSession(ctx, createdUser, "", "")
 	if err != nil {
 		return model.User{}, "", err
 	}

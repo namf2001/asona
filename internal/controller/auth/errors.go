@@ -12,8 +12,11 @@ var (
 	// ErrInvalidToken is returned when the JWT token is malformed, expired, or has an invalid signature.
 	ErrInvalidToken = errors.New("authentication failed: invalid or expired token")
 
-	// ErrUserAlreadyExists is returned when an email/username is already taken.
+	// ErrUserAlreadyExists is returned when an email is already registered.
 	ErrUserAlreadyExists = errors.New("registration failed: email already exists")
+
+	// ErrUsernameAlreadyExists is returned when the chosen username is already taken.
+	ErrUsernameAlreadyExists = errors.New("registration failed: username already exists")
 
 	// ErrWrongOTP is returned when the OTP provided is invalid or expired.
 	ErrWrongOTP = errors.New("registration failed: wrong or expired otp")

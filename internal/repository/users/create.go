@@ -32,7 +32,14 @@ func (i impl) Create(ctx context.Context, user model.User) (model.User, error) {
 	if err != nil {
 		var pqErr *pq.Error
 		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
-			return model.User{}, pkgerrors.WithStack(ErrEmailAlreadyExists)
+			// Distinguish which unique constraint was violated by its name.
+			switch pqErr.Constraint {
+			case "users_username_key":
+				return model.User{}, pkgerrors.WithStack(ErrUsernameAlreadyExists)
+			default:
+				// email or any other unique column
+				return model.User{}, pkgerrors.WithStack(ErrEmailAlreadyExists)
+			}
 		}
 		return model.User{}, pkgerrors.WithStack(fmt.Errorf("failed to create user: %w", err))
 	}

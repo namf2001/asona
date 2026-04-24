@@ -26,6 +26,7 @@ var (
 	TokenExpired               = ResponseCode{"ERR011", "Token expired"}
 	UserNotFound               = ResponseCode{"ERR004", "User not found"}
 	EmailExists                = ResponseCode{"ERR008", "This email is already registered"}
+	UsernameExists             = ResponseCode{"ERR015", "This username is already taken"}
 	PasswordIncorrect          = ResponseCode{"ERR005", "The password is incorrect"}
 	LoginFail                  = ResponseCode{"ERR006", "Login fail, something wrong"}
 	RegisterUserFail           = ResponseCode{"ERR007", "Register user fail, something wrong"}

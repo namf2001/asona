@@ -5,20 +5,22 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"asona/internal/constants"
 	"asona/internal/controller/auth"
 	"asona/internal/handler/response"
 	"asona/internal/pkg/logger"
-
-	"github.com/gin-gonic/gin"
 )
 
-type LoginRequest struct {
+// loginRequest holds the credentials submitted by the user.
+type loginRequest struct {
 	Email    string `json:"email"    binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
 
-type LoginUserResponse struct {
+// loginUserResponse is the user sub-object returned inside the login payload.
+type loginUserResponse struct {
 	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	Username    string `json:"username"`
@@ -27,8 +29,9 @@ type LoginUserResponse struct {
 	IsOnboarded bool   `json:"is_onboarded"`
 }
 
-type LoginResponse struct {
-	User         LoginUserResponse `json:"user"`
+// loginResponse is the full JSON body returned on successful login or registration.
+type loginResponse struct {
+	User         loginUserResponse `json:"user"`
 	SessionToken string            `json:"session_token"`
 }
 
@@ -38,13 +41,13 @@ type LoginResponse struct {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        request  body      LoginRequest  true  "Login credentials"
-// @Success      200      {object}  response.Response{data=LoginResponse}
+// @Param        request  body      loginRequest  true  "Login credentials"
+// @Success      200      {object}  response.Response{data=loginResponse}
 // @Failure      400      {object}  response.Response
 // @Failure      401      {object}  response.Response
 // @Router       /auth/login [post]
 func (h Handler) Login(c *gin.Context) {
-	var req LoginRequest
+	var req loginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logger.ERROR.Printf("[Login] failed request param: %+v", err)
 		c.JSON(http.StatusBadRequest, response.NewResponse(
@@ -66,7 +69,7 @@ func (h Handler) Login(c *gin.Context) {
 		if errors.Is(err, auth.ErrUserNotFound) || errors.Is(err, auth.ErrInvalidPassword) {
 			c.JSON(http.StatusUnauthorized, response.NewResponse(
 				constants.LoginFail.Code,
-				err.Error(),
+				constants.LoginFail.Message,
 				nil,
 			))
 			return
@@ -80,18 +83,12 @@ func (h Handler) Login(c *gin.Context) {
 		return
 	}
 
-	// Assuming controller now returns model.User or auth.UserResponse
-	// If it returns model.User, we need to map it.
-	// Based on previous edits, get_profile returns model.User, but I defined UserResponse in controller.
-	// Let's assume we map to the controller's public response type if needed,
-	// but the handler should have its own response struct.
-
 	logger.INFO.Printf("[Login] user logged in successfully: %s", user.Email)
 	c.JSON(http.StatusOK, response.NewResponse(
 		constants.LoginSuccess.Code,
 		constants.LoginSuccess.Message,
-		LoginResponse{
-			User: LoginUserResponse{
+		loginResponse{
+			User: loginUserResponse{
 				ID:          user.ID,
 				Name:        user.Name,
 				Username:    user.Username,

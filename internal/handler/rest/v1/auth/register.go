@@ -4,15 +4,16 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"asona/internal/constants"
 	"asona/internal/controller/auth"
 	"asona/internal/handler/response"
 	"asona/internal/pkg/logger"
-
-	"github.com/gin-gonic/gin"
 )
 
-type RegisterRequest struct {
+// registerRequest holds the unified registration request body for all 3 steps.
+type registerRequest struct {
 	Step     int    `json:"step"     binding:"required,oneof=1 2 3"`
 	Email    string `json:"email"    binding:"required,email"`
 	OTP      string `json:"otp"`
@@ -27,14 +28,15 @@ type RegisterRequest struct {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        request  body      RegisterRequest  true  "Registration details"
+// @Param        request  body      registerRequest  true  "Registration details"
 // @Success      200      {object}  response.Response
-// @Success      201      {object}  response.Response{data=LoginResponse}
+// @Success      201      {object}  response.Response{data=loginResponse}
 // @Failure      400      {object}  response.Response
+// @Failure      409      {object}  response.Response
 // @Failure      500      {object}  response.Response
 // @Router       /auth/register [post]
 func (h Handler) Register(c *gin.Context) {
-	var req RegisterRequest
+	var req registerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logger.ERROR.Printf("[Register] failed request param: %+v", err)
 		c.JSON(http.StatusBadRequest, response.NewResponse(
@@ -52,11 +54,19 @@ func (h Handler) Register(c *gin.Context) {
 		err := h.ctrl.RegisterStep1SendOTP(ctx, req.Email)
 		if err != nil {
 			logger.ERROR.Printf("[Register] step 1 failed for %s: %+v", req.Email, err)
-			code := constants.InternalServerError.Code
 			if errors.Is(err, auth.ErrUserAlreadyExists) {
-				code = constants.EmailExists.Code
+				c.JSON(http.StatusConflict, response.NewResponse(
+					constants.EmailExists.Code,
+					constants.EmailExists.Message,
+					nil,
+				))
+				return
 			}
-			c.JSON(http.StatusInternalServerError, response.NewResponse(code, err.Error(), nil))
+			c.JSON(http.StatusInternalServerError, response.NewResponse(
+				constants.InternalServerError.Code,
+				constants.InternalServerError.Message,
+				nil,
+			))
 			return
 		}
 		c.JSON(http.StatusOK, response.NewResponse(
@@ -78,11 +88,19 @@ func (h Handler) Register(c *gin.Context) {
 		err := h.ctrl.RegisterStep2VerifyOTP(ctx, req.Email, req.OTP)
 		if err != nil {
 			logger.ERROR.Printf("[Register] step 2 failed for %s: %+v", req.Email, err)
-			code := constants.InternalServerError.Code
 			if errors.Is(err, auth.ErrWrongOTP) {
-				code = constants.VerifyCodeExpired.Code
+				c.JSON(http.StatusBadRequest, response.NewResponse(
+					constants.VerifyCodeExpired.Code,
+					constants.VerifyCodeExpired.Message,
+					nil,
+				))
+				return
 			}
-			c.JSON(http.StatusInternalServerError, response.NewResponse(code, err.Error(), nil))
+			c.JSON(http.StatusInternalServerError, response.NewResponse(
+				constants.InternalServerError.Code,
+				constants.InternalServerError.Message,
+				nil,
+			))
 			return
 		}
 		c.JSON(http.StatusOK, response.NewResponse(
@@ -111,13 +129,35 @@ func (h Handler) Register(c *gin.Context) {
 		})
 		if err != nil {
 			logger.ERROR.Printf("[Register] step 3 failed for %s: %+v", req.Email, err)
-			code := constants.InternalServerError.Code
 			if errors.Is(err, auth.ErrUserAlreadyExists) {
-				code = constants.EmailExists.Code
-			} else if errors.Is(err, auth.ErrWrongOTP) {
-				code = constants.VerifyCodeExpired.Code
+				c.JSON(http.StatusConflict, response.NewResponse(
+					constants.EmailExists.Code,
+					constants.EmailExists.Message,
+					nil,
+				))
+				return
 			}
-			c.JSON(http.StatusInternalServerError, response.NewResponse(code, err.Error(), nil))
+			if errors.Is(err, auth.ErrUsernameAlreadyExists) {
+				c.JSON(http.StatusConflict, response.NewResponse(
+					constants.UsernameExists.Code,
+					constants.UsernameExists.Message,
+					nil,
+				))
+				return
+			}
+			if errors.Is(err, auth.ErrWrongOTP) {
+				c.JSON(http.StatusBadRequest, response.NewResponse(
+					constants.VerifyCodeExpired.Code,
+					constants.VerifyCodeExpired.Message,
+					nil,
+				))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, response.NewResponse(
+				constants.InternalServerError.Code,
+				constants.InternalServerError.Message,
+				nil,
+			))
 			return
 		}
 
@@ -125,8 +165,8 @@ func (h Handler) Register(c *gin.Context) {
 		c.JSON(http.StatusCreated, response.NewResponse(
 			constants.RegisterUserSuccess.Code,
 			constants.RegisterUserSuccess.Message,
-			LoginResponse{
-				User: LoginUserResponse{
+			loginResponse{
+				User: loginUserResponse{
 					ID:       user.ID,
 					Name:     user.Name,
 					Username: user.Username,

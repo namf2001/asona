@@ -8,11 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"time"
-
-	"asona/config"
 	"asona/internal/model"
-	"asona/internal/pkg/jwt"
 	"asona/internal/repository"
 	"asona/internal/repository/accounts"
 	"asona/internal/repository/users"
@@ -70,87 +66,61 @@ func (i impl) GoogleCallback(ctx context.Context, code string) (model.User, stri
 	err = i.repo.DoInTx(ctx, func(ctx context.Context, txRepo repository.Registry) error {
 		account, err := txRepo.Account().GetByProvider(ctx, "google", profile.ID)
 		if err == nil {
+			// Existing Google account — load user and issue session.
 			user, err = txRepo.User().GetByID(ctx, account.UserID)
 			if err != nil {
 				return err
 			}
-			sessionToken, err = jwt.GenerateToken(user.ID, user.Email)
+		} else {
+			if !errors.Is(err, accounts.ErrAccountNotFound) {
+				return err
+			}
+
+			// No Google account yet — find or create the user row.
+			user, err = txRepo.User().GetByEmail(ctx, profile.Email)
 			if err != nil {
-				return pkgerrors.WithStack(fmt.Errorf("failed to generate token: %w", err))
+				if !errors.Is(err, users.ErrUserNotFound) {
+					return err
+				}
+				user, err = createGoogleUser(ctx, txRepo, profile)
+				if err != nil {
+					return err
+				}
 			}
 
-			accessDuration := config.GetConfig().JWTAccessDuration
-			if accessDuration == 0 {
-				accessDuration = time.Hour
-			}
-
-			_, err = txRepo.Session().Create(ctx, model.Session{
-				UserID:       user.ID,
-				SessionToken: sessionToken,
-				ExpiresAt:    time.Now().Add(accessDuration),
+			_, err = txRepo.Account().Create(ctx, model.Account{
+				UserID:            user.ID,
+				Provider:          "google",
+				ProviderAccountID: profile.ID,
+				AccessToken:       token.AccessToken,
+				RefreshToken:      token.RefreshToken,
+				IDToken:           tokenValue(token.Extra("id_token")),
+				Scope:             tokenValue(token.Extra("scope")),
 			})
 			if err != nil {
-				return err
-			}
-			return nil
-		}
-		if !errors.Is(err, accounts.ErrAccountNotFound) {
-			return err
-		}
-
-		user, err = txRepo.User().GetByEmail(ctx, profile.Email)
-		if err != nil {
-			if !errors.Is(err, users.ErrUserNotFound) {
-				return err
-			}
-
-			user, err = createGoogleUser(ctx, txRepo, profile)
-			if err != nil {
-				return err
-			}
-		}
-
-		_, err = txRepo.Account().Create(ctx, model.Account{
-			UserID:            user.ID,
-			Provider:          "google",
-			ProviderAccountID: profile.ID,
-			AccessToken:       token.AccessToken,
-			RefreshToken:      token.RefreshToken,
-			IDToken:           tokenValue(token.Extra("id_token")),
-			Scope:             tokenValue(token.Extra("scope")),
-		})
-		if err != nil {
-			if errors.Is(err, accounts.ErrAccountAlreadyExists) {
-				account, lookupErr := txRepo.Account().GetByProvider(ctx, "google", profile.ID)
-				if lookupErr != nil {
-					return lookupErr
+				if errors.Is(err, accounts.ErrAccountAlreadyExists) {
+					existingAccount, lookupErr := txRepo.Account().GetByProvider(ctx, "google", profile.ID)
+					if lookupErr != nil {
+						return lookupErr
+					}
+					user, lookupErr = txRepo.User().GetByID(ctx, existingAccount.UserID)
+					if lookupErr != nil {
+						return lookupErr
+					}
+				} else {
+					return err
 				}
-				user, lookupErr = txRepo.User().GetByID(ctx, account.UserID)
-				if lookupErr != nil {
-					return lookupErr
-				}
-			} else {
-				return err
 			}
 		}
 
-		sessionToken, err = jwt.GenerateToken(user.ID, user.Email)
-		if err != nil {
-			return pkgerrors.WithStack(fmt.Errorf("failed to generate token: %w", err))
-		}
-
-		accessDuration := config.GetConfig().JWTAccessDuration
-		if accessDuration == 0 {
-			accessDuration = time.Hour
-		}
-
-		_, err = txRepo.Session().Create(ctx, model.Session{
-			UserID:       user.ID,
-			SessionToken: sessionToken,
-			ExpiresAt:    time.Now().Add(accessDuration),
-		})
-		return err
+		return nil
 	}, nil)
+	if err != nil {
+		return model.User{}, "", err
+	}
+
+	// Issue session outside the transaction using the standard helper
+	sessionToken, err = i.issueSession(ctx, user, "", "")
 	if err != nil {
 		return model.User{}, "", err
 	}
